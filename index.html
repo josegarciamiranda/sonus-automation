@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SONUS AUTOMATION - MVP v1.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .drag-over { border: 2px dashed #3b82f6; background-color: #eff6ff; }
+        .sidebar-active { background-color: #1f2937; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-gray-950 border-b border-gray-800 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="bg-blue-600 p-2 rounded-lg text-white font-bold text-xl tracking-wider">SONUS</div>
+            <span class="text-xs uppercase font-semibold tracking-widest text-gray-400 bg-gray-800 px-2 py-1 rounded">Automation MVP v1.0</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div id="userInfo" class="text-sm font-medium text-gray-300"></div>
+            <select id="sessionSelector" class="bg-gray-800 border border-gray-700 text-white rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="switchSession(this.value)">
+                </select>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <aside class="w-64 bg-gray-950 border-r border-gray-800 flex flex-col justify-between">
+            <nav class="p-4 space-y-1" id="mainNavigation">
+                </nav>
+            <div class="p-4 border-t border-gray-800 text-center text-xs text-gray-500">
+                Flujo Estricto de Trabajo Obligatorio
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto bg-gray-900">
+            
+            <section id="screen-admin" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Pantalla 0: Administración General (SaaS Maestro)</h2>
+                        <p class="text-sm text-gray-400">Control global de cuentas de clientes y Biblioteca Musical Global unificada.</p>
+                    </div>
+                    <button onclick="openClientModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium flex items-center gap-2 text-sm transition shadow"><i data-lucide="plus-circle" class="w-4 h-4"></i> Crear Nuevo Cliente</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 lg:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 text-blue-400"><i data-lucide="users" class="w-5 h-5"></i> Clientes Registrados</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-gray-400">
+                                <thead class="text-xs uppercase bg-gray-900 text-gray-300">
+                                    <tr>
+                                        <th class="p-3">Empresa / Cliente</th>
+                                        <th class="p-3">Plan</th>
+                                        <th class="p-3">Estado</th>
+                                        <th class="p-3">Vencimiento</th>
+                                        <th class="p-3 text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminClientsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center gap-2 text-purple-400"><i data-lucide="upload-cloud" class="w-5 h-5"></i> Carga a Biblioteca Global</h3>
+                        <p class="text-xs text-gray-400 mb-4">Solo tú puedes alimentar el almacenamiento global compartido.</p>
+                        <form id="globalUploadForm" class="space-y-3" onsubmit="handleGlobalUpload(event)">
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Título</label>
+                                <input type="text" id="up-title" required class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Artista / Origen</label>
+                                <input type="text" id="up-artist" required class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Duración (Ej: 03:15)</label>
+                                <input type="text" id="up-duration" placeholder="03:00" required class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">URL del Audio (.mp3 de Red)</label>
+                                <input type="url" id="up-url" placeholder="https://ejemplo.com/audio.mp3" required class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded text-sm font-semibold transition">Inyectar a Biblioteca Global</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-library" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 1: Biblioteca de Audios</h2>
+                    <p class="text-sm text-gray-400">Visualización de pistas de la Biblioteca Global y anuncios independientes.</p>
+                </div>
+                <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                        <input type="text" id="librarySearch" placeholder="Buscar por título o artista..." oninput="renderLibrary()" class="w-full sm:w-72 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                        <div class="text-xs text-gray-400" id="libraryStats"></div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-gray-400">
+                            <thead class="text-xs uppercase bg-gray-900 text-gray-300">
+                                <tr>
+                                    <th class="p-3">Título</th>
+                                    <th class="p-3">Artista</th>
+                                    <th class="p-3">Duración</th>
+                                    <th class="p-3">Origen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="libraryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-categories" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 2: Categorías Independientes</h2>
+                    <p class="text-sm text-gray-400">Define tus contenedores de música o anuncios (Ej: 80s, Pop, Rock, Comerciales).</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 h-fit">
+                        <h3 class="text-lg font-semibold mb-4 text-blue-400">Nueva Categoría</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="newCategoryName" placeholder="Ej: Rock 90s" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            <button onclick="createNewCategory()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-semibold transition">Crear Categoría</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 md:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-300">Tus Categorías Actuales</h3>
+                        <div id="categoriesList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-classification" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 3: Clasificación Cruzada</h2>
+                    <p class="text-sm text-gray-400">Arrastra canciones de la biblioteca o selecciónalas para agruparlas en tus categorías.</p>
+                </div>
+                <div class="flex gap-4 items-center bg-gray-950 p-4 rounded-xl border border-gray-800">
+                    <label class="text-sm text-gray-300 font-medium">Trabajar en Categoría:</label>
+                    <select id="classificationCategorySelect" onchange="renderClassification()" class="bg-gray-900 border border-gray-700 text-white rounded px-3 py-1.5 text-sm focus:ring-1 focus:ring-blue-500"></select>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 flex flex-col h-[500px]">
+                        <h3 class="text-base font-semibold mb-3 text-gray-300 flex justify-between items-center">
+                            <span>Biblioteca Completa</span>
+                            <span class="text-xs text-gray-500">Arrastra hacia la derecha o usa el botón</span>
+                        </h3>
+                        <div id="classificationLibraryPanel" class="flex-1 overflow-y-auto space-y-2 pr-2"></div>
+                    </div>
+                    <div id="classificationTargetPanel" class="bg-gray-950 p-6 rounded-xl border-2 border-gray-800 flex flex-col h-[500px] transition-all" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="handleDrop(event)">
+                        <h3 class="text-base font-semibold mb-3 text-blue-400">Contenido de la Categoría</h3>
+                        <div id="classificationCategoryContent" class="flex-1 overflow-y-auto space-y-2 pr-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-clocks" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 4: Relojes Musicales (Estructuras)</h2>
+                    <p class="text-sm text-gray-400">Diseña la secuencia lógica de reproducción ordenando tus bloques de categorías.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 h-fit space-y-4">
+                        <h3 class="text-lg font-semibold text-blue-400">Crear Estructura</h3>
+                        <input type="text" id="newClockName" placeholder="Ej: Bloque Mañana" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                        <button onclick="createNewClock()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-semibold transition">Crear Reloj</button>
+                        <hr class="border-gray-800">
+                        <h4 class="text-xs uppercase font-bold text-gray-400">Categorías Disponibles</h4>
+                        <div id="clockCategoriesSource" class="space-y-2"></div>
+                    </div>
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 lg:col-span-2 flex flex-col min-h-[400px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-300">Configuración de Reloj Activo</h3>
+                            <select id="activeClockSelector" onchange="renderClockBuilder()" class="bg-gray-900 border border-gray-700 text-white rounded px-3 py-1.5 text-sm"></select>
+                        </div>
+                        <div id="clockDropZone" class="flex-1 bg-gray-900 border-2 border-dashed border-gray-800 rounded-xl p-4 flex flex-col gap-2 overflow-y-auto" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="handleClockDrop(event)">
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-channels" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 5: Canales de Salida</h2>
+                    <p class="text-sm text-gray-400">Crea las terminales de emisión independientes de tu comercio (Ej: Zona General, Cafetería).</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 h-fit">
+                        <h3 class="text-lg font-semibold mb-4 text-blue-400">Nuevo Canal</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="newChannelName" placeholder="Ej: Salón Principal" class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:ring-1 focus:ring-blue-500">
+                            <button onclick="createNewChannel()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-semibold transition">Registrar Canal</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 md:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-300">Canales Configurados</h3>
+                        <div id="channelsList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-schedule" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 6: Parrilla de Programación Horaria</h2>
+                    <p class="text-sm text-gray-400">Asigna qué Reloj Musical gobernará cada bloque horario en un canal seleccionado.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 h-fit space-y-4">
+                        <h3 class="text-lg font-semibold text-blue-400">Asignar Bloque</h3>
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Canal de Destino</label>
+                            <select id="schedChannel" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Día de la Semana</label>
+                            <select id="schedDay" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2">
+                                <option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miércoles">Miércoles</option>
+                                <option value="Jueves">Jueves</option><option value="Viernes">Viernes</option><option value="Sábado">Sábado</option>
+                                <option value="Domingo">Domingo</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Hora Inicio</label>
+                                <input type="number" id="schedStart" min="0" max="23" value="8" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Hora Fin</label>
+                                <input type="number" id="schedEnd" min="1" max="24" value="12" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Reloj Musical Asignado</label>
+                            <select id="schedClock" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2"></select>
+                        </div>
+                        <button onclick="saveScheduleBlock()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm font-semibold transition">Insertar a la Parrilla</button>
+                    </div>
+
+                    <div class="bg-gray-950 p-6 rounded-xl border border-gray-800 lg:col-span-3">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-300">Parrilla Semanal del Canal</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-gray-400 border border-gray-800">
+                                <thead class="bg-gray-900 text-gray-200">
+                                    <tr>
+                                        <th class="p-2 border border-gray-800">Bloque</th>
+                                        <th class="p-2 border border-gray-800">Lunes</th>
+                                        <th class="p-2 border border-gray-800">Martes</th>
+                                        <th class="p-2 border border-gray-800">Miércoles</th>
+                                        <th class="p-2 border border-gray-800">Jueves</th>
+                                        <th class="p-2 border border-gray-800">Viernes</th>
+                                        <th class="p-2 border border-gray-800">Sábado</th>
+                                        <th class="p-2 border border-gray-800">Domingo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scheduleGridBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-player" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Pantalla 7: Emisión Automática Automatizada</h2>
+                    <p class="text-sm text-gray-400">Simulador de reproducción en tiempo real según reloj gobernante actual.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-950 p-8 rounded-2xl border border-gray-800 lg:col-span-2 flex flex-col justify-between space-y-6 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500 animate-pulse"></div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="bg-blue-900 text-blue-300 text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full" id="playerChannelBadge">SIN CANAL</span>
+                                <h3 class="text-2xl font-black mt-3 text-white tracking-tight" id="playerCurrentTitle">Ningún archivo en ejecución</h3>
+                                <p class="text-gray-400 text-sm mt-1 flex items-center gap-1"><i data-lucide="music" class="w-4 h-4"></i> <span id="playerCurrentArtist">-</span></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-gray-500 block uppercase font-bold">Reloj Activo</span>
+                                <span class="text-sm text-yellow-400 font-mono" id="playerActiveClock">Ninguno</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-xs text-gray-400 uppercase font-bold block">Categoría de Selección Actual</span>
+                                <span class="text-sm text-emerald-400 font-semibold" id="playerCurrentCategory">-</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-gray-400 uppercase font-bold block">Tiempo Restante</span>
+                                <span class="text-xl font-mono font-bold text-white" id="playerTimeRemaining">00:00</span>
+                            </div>
+                        </div>
+
+                        <audio id="mainAudioEngine" ontimeupdate="updateAudioProgress()" onended="trackEnded()"></audio>
+
+                        <div class="flex items-center gap-4">
+                            <button id="playBtn" onclick="togglePlayback()" class="bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-full transition shadow-lg transform hover:scale-105"><i data-lucide="play" class="w-6 h-6"></i></button>
+                            <button onclick="skipTrack()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 p-3 rounded-full transition"><i data-lucide="skip-forward" class="w-5 h-5"></i></button>
+                            <div class="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden">
+                                <div id="playbackProgressBar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-950 p-6 rounded-2xl border border-gray-800 flex flex-col h-[350px]">
+                        <h3 class="text-base font-bold text-gray-300 mb-3 flex items-center gap-2"><i data-lucide="list-music" class="w-4 h-4"></i> Próxima Secuencia del Reloj</h3>
+                        <div id="playerQueueList" class="flex-1 overflow-y-auto space-y-2 text-sm text-gray-400 pr-2"></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="clientModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-950 border border-gray-800 p-6 rounded-xl max-w-md w-full space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-white">Gestión Operativa de Cuenta</h3>
+            <form id="clientForm" onsubmit="saveClientForm(event)" class="space-y-3">
+                <input type="hidden" id="modalClientId">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Nombre Comercial de la Cuenta</label>
+                    <input type="text" id="modalClientName" required class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase font-bold text-gray-400 mb-1">Plan de Suscripción</label>
+                    <select id="modalClientPlan" class="w-full bg-gray-900 border border-gray-700 text-white text-sm rounded px-3 py-2">
+                        <option value="Básico">Básico</option>
+                        <option value="Profesional">Profesional</option>
+                        <option value="Empresarial">Empresarial</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeClientModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2 rounded text-sm">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-semibold">Guardar Cuenta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // SEED DE AUDIOS GLOBALES COMPARTIDOS REALES Y ESTABLES (SIN REQUERIR CARGA MANUAL INICIAL)
+        const DEFAULT_GLOBAL_LIBRARY = [
+            { id: "g1", title: "Lo-Fi Ambient Beats 1", artist: "Sonic Tech", duration: "00:45", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { id: "g2", title: "Lo-Fi Ambient Beats 2", artist: "Sonic Tech", duration: "00:50", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+            { id: "g3", title: "Corporate Presentation Music", artist: "Media Audio", duration: "01:02", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+            { id: "g4", title: "Anuncio Promocional Ofertas", artist: "Locución Comercial", duration: "00:30", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+            { id: "g5", title: "Jingle Corporativo Identificador", artist: "Audio Branding", duration: "00:15", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" }
+        ];
+
+        // INICIALIZACIÓN DEL SISTEMA CENTRALIZADO EN LOCALSTORAGE
+        if(!localStorage.getItem("sonus_global_library")) {
+            localStorage.setItem("sonus_global_library", JSON.stringify(DEFAULT_GLOBAL_LIBRARY));
+        }
+        if(!localStorage.getItem("sonus_accounts")) {
+            localStorage.setItem("sonus_accounts", JSON.stringify([
+                { id: "admin", name: "Administrador Maestro", plan: "SaaS Owner", status: "Activa", created: "2026-06-20", expires: "Perpetuo" },
+                { id: "c1", name: "Supermercado Aranjuez", plan: "Profesional", status: "Activa", created: "2026-06-25", expires: "2026-12-25" },
+                { id: "c2", name: "Hotel Plaza Vista", plan: "Básico", status: "Activa", created: "2026-06-29", expires: "2026-07-29" }
+            ]));
+        }
+
+        // VARIABLES DE ESTADO DE LA APLICACIÓN RUNTIME
+        let currentUserId = "admin"; 
+        let currentScreen = "admin";
+        let draggedAudioId = null;
+        let draggedCategoryId = null;
+        let clockIndexCounter = 0;
+
+        // MOTOR DE AUDIO E INSTRUMENTACIÓN EN VIVO
+        const AUDIO_ENGINE = document.getElementById("mainAudioEngine");
+        let playbackInterval = null;
+        let currentSequenceQueue = [];
+        let currentQueuePointer = 0;
+
+        // VISTAS DE MENÚ SEGÚN EL ROL DE ACCESO ACTUAL
+        const NAVIGATION_ITEMS = {
+            admin: [
+                { id: "admin", name: "Administración General", icon: "shield" },
+                { id: "library", name: "Biblioteca", icon: "music" }
+            ],
+            client: [
+                { id: "library", name: "Biblioteca", icon: "music" },
+                { id: "categories", name: "Categorías", icon: "tags" },
+                { id: "classification", name: "Clasificación", icon: "shuffle" },
+                { id: "clocks", name: "Relojes Musicales", icon: "clock" },
+                { id: "channels", name: "Canales", icon: "radio" },
+                { id: "schedule", name: "Programación", icon: "calendar" },
+                { id: "player", name: "Reproductor", icon: "play-circle" }
+            ]
+        };
+
+        // ENTRADA INICIAL DE LA APP
+        window.addEventListener("DOMContentLoaded", () => {
+            populateSessionSelector();
+            switchSession("admin");
+        });
+
+        function getGlobalLibrary() { return JSON.parse(localStorage.getItem("sonus_global_library")); }
+        function getAccounts() { return JSON.parse(localStorage.getItem("sonus_accounts")); }
+        function saveAccounts(data) { localStorage.setItem("sonus_accounts", JSON.stringify(data)); }
+
+        // MANEJO DE ESTRUCTURA ISOLADA (TENANT STORAGE)
+        function getTenantData() {
+            let data = localStorage.getItem(`sonus_tenant_${currentUserId}`);
+            if(!data) {
+                data = { categories: [], mappings: {}, clocks: {}, channels: [], schedule: [] };
+                localStorage.setItem(`sonus_tenant_${currentUserId}`, JSON.stringify(data));
+            }
+            return typeof data === "string" ? JSON.parse(data) : data;
+        }
+        function saveTenantData(data) {
+            localStorage.setItem(`sonus_tenant_${currentUserId}`, JSON.stringify(data));
+        }
+
+        // CONTROL DE SESIÓN MULTI-TENANT SIMULADO
+        function populateSessionSelector() {
+            const selector = document.getElementById("sessionSelector");
+            selector.innerHTML = "";
+            getAccounts().forEach(acc => {
+                const opt = document.createElement("option");
+                opt.value = acc.id;
+                opt.textContent = `${acc.name} (${acc.id === "admin" ? "Admin" : acc.status})`;
+                selector.appendChild(opt);
+            });
+        }
+
+        function switchSession(userId) {
+            const acc = getAccounts().find(a => a.id === userId);
+            if(acc.id !== "admin" && acc.status !== "Activa") {
+                alert(`Acceso denegado. Esta cuenta está actualmente [${acc.status}]. Comuníquese con el Administrador Maestro.`);
+                document.getElementById("sessionSelector").value = currentUserId;
+                return;
+            }
+            // Parar reproductor en seco si cambia de cliente
+            AUDIO_ENGINE.pause();
+            clearInterval(playbackInterval);
+            document.getElementById("playBtn").innerHTML = `<i data-lucide="play" class="w-6 h-6"></i>`;
+            lucide.createIcons();
+
+            currentUserId = userId;
+            const isRoot = currentUserId === "admin";
+            
+            document.getElementById("userInfo").innerHTML = `<span class="text-xs text-gray-400">Rol:</span> <span class="text-blue-400 font-bold">${isRoot ? 'ADMINISTRADOR MAESTRO' : acc.name}</span>`;
+            
+            renderNavigation(isRoot ? "admin" : "client");
+            navigateTo(isRoot ? "admin" : "library");
+        }
+
+        function renderNavigation(role) {
+            const container = document.getElementById("mainNavigation");
+            container.innerHTML = "";
+            NAVIGATION_ITEMS[role].forEach(item => {
+                const btn = document.createElement("button");
+                btn.className = `w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition text-gray-400 hover:text-white hover:bg-gray-900`;
+                btn.id = `nav-btn-${item.id}`;
+                btn.onclick = () => navigateTo(item.id);
+                btn.innerHTML = `<i data-lucide="${item.icon}" class="w-4 h-4"></i> <span>${item.name}</span>`;
+                container.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function navigateTo(screenId) {
+            document.querySelectorAll("main > section").forEach(s => s.classList.add("hidden"));
+            document.querySelectorAll("#mainNavigation button").forEach(b => b.classList.remove("sidebar-active", "text-white"));
+            
+            document.getElementById(`screen-${screenId}`).classList.remove("hidden");
+            const activeBtn = document.getElementById(`nav-btn-${screenId}`);
+            if(activeBtn) activeBtn.classList.add("sidebar-active", "text-white");
+            
+            currentScreen = screenId;
+            // Disparador de refresco de interfaz específico de pantalla
+            if(screenId === "admin") renderAdminPanel();
+            if(screenId === "library") renderLibrary();
+            if(screenId === "categories") renderCategories();
+            if(screenId === "classification") renderClassification();
+            if(screenId === "clocks") renderClockBuilder();
+            if(screenId === "channels") renderChannels();
+            if(screenId === "schedule") renderSchedule();
+            if(screenId === "player") renderPlayerView();
+        }
+
+        // --- LÓGICA DE GESTIÓN PANTALLA 0 (ADMIN MAESTRO) ---
+        function renderAdminPanel() {
+            const tbody = document.getElementById("adminClientsTable");
+            tbody.innerHTML = "";
+            getAccounts().filter(a => a.id !== "admin").forEach(acc => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-gray-800 hover:bg-gray-900/50";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-white">${acc.name}</td>
+                    <td class="p-3"><span class="bg-gray-800 text-gray-300 px-2 py-0.5 rounded text-xs">${acc.plan}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${acc.status === 'Activa' ? 'bg-emerald-950 text-emerald-400' : 'bg-red-950 text-red-400'}">${acc.status}</span></td>
+                    <td class="p-3 text-xs text-gray-500">${acc.expires}</td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="toggleAccountStatus('${acc.id}')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">${acc.status === 'Activa' ? 'Suspender' : 'Activar'}</button>
+                        <button onclick="deleteAccount('${acc.id}')" class="text-xs bg-red-950 text-red-400 hover:bg-red-900 px-2 py-1 rounded">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openClientModal(id = "") {
+            document.getElementById("clientModal").classList.remove("hidden");
+            document.getElementById("modalClientId").value = id;
+        }
+        function closeClientModal() { document.getElementById("clientModal").classList.add("hidden"); document.getElementById("clientForm").reset(); }
+
+        function saveClientForm(e) {
+            e.preventDefault();
+            const accounts = getAccounts();
+            const name = document.getElementById("modalClientName").value;
+            const plan = document.getElementById("modalClientPlan").value;
+            const newId = "c_" + Date.now();
+            
+            accounts.push({ id: newId, name, plan, status: "Activa", created: new Date().toISOString().split('T')[0], expires: "2027-01-01" });
+            saveAccounts(accounts);
+            populateSessionSelector();
+            renderAdminPanel();
+            closeClientModal();
+        }
+
+        function toggleAccountStatus(id) {
+            let accs = getAccounts();
+            accs = accs.map(a => {
+                if(a.id === id) a.status = a.status === "Activa" ? "Suspendida" : "Activa";
+                return a;
+            });
+            saveAccounts(accs);
+            populateSessionSelector();
+            renderAdminPanel();
+        }
+
+        function deleteAccount(id) {
+            if(confirm("¿Está seguro de eliminar de forma permanente esta cuenta SaaS?")) {
+                let accs = getAccounts();
+                accs = accs.filter(a => a.id !== id);
+                saveAccounts(accs);
+                populateSessionSelector();
+                renderAdminPanel();
+            }
+        }
+
+        function handleGlobalUpload(e) {
+            e.preventDefault();
+            const library = getGlobalLibrary();
+            const title = document.getElementById("up-title").value;
+            const artist = document.getElementById("up-artist").value;
+            const duration = document.getElementById("up-duration").value;
+            const url = document.getElementById("up-url").value;
+
+            library.push({ id: "g_" + Date.now(), title, artist, duration, url });
+            localStorage.setItem("sonus_global_library", JSON.stringify(library));
+            alert("Canción inyectada con éxito en la Biblioteca Global.");
+            document.getElementById("globalUploadForm").reset();
+        }
+
+        // --- LÓGICA DE LA BIBLIOTECA PANTALLA 1 ---
+        function renderLibrary() {
+            const query = document.getElementById("librarySearch").value.toLowerCase();
+            const tbody = document.getElementById("libraryTableBody");
+            tbody.innerHTML = "";
+            const tracks = getGlobalLibrary();
+
+            const filtered = tracks.filter(t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query));
+            document.getElementById("libraryStats").textContent = `Mostrando ${filtered.length} pistas en la base compartida global`;
+
+            filtered.forEach(track => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-gray-800 hover:bg-gray-900/40 text-sm";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-white">${track.title}</td>
+                    <td class="p-3">${track.artist}</td>
+                    <td class="p-3 font-mono text-gray-500">${track.duration}</td>
+                    <td class="p-3"><span class="text-xs bg-purple-950 text-purple-400 px-2 py-0.5 rounded">Biblioteca Global</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- GESTIÓN DE CATEGORÍAS PANTALLA 2 ---
+        function renderCategories() {
+            const data = getTenantData();
+            const container = document.getElementById("categoriesList");
+            container.innerHTML = "";
+            
+            if(data.categories.length === 0) {
+                container.innerHTML = `<div class="text-sm text-gray-500 col-span-2">No tienes categorías creadas. Empieza agregando una.</div>`;
+                return;
+            }
+
+            data.categories.forEach(cat => {
+                const mappedCount = data.mappings[cat] ? data.mappings[cat].length : 0;
+                const card = document.createElement("div");
+                card.className = "bg-gray-900 border border-gray-800 p-4 rounded-lg flex justify-between items-center";
+                card.innerHTML = `
+                    <div>
+                        <h4 class="font-bold text-white">${cat}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">${mappedCount} canciones vinculadas</p>
+                    </div>
+                    <button onclick="deleteCategory('${cat}')" class="text-xs text-red-400 hover:bg-red-950/40 px-2 py-1 rounded">Eliminar</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function createNewCategory() {
+            const input = document.getElementById("newCategoryName");
+            const catName = input.value.trim();
+            if(!catName) return;
+            const data = getTenantData();
+            if(data.categories.includes(catName)) { alert("La categoría ya existe"); return; }
+            
+            data.categories.push(catName);
+            data.mappings[catName] = [];
+            saveTenantData(data);
+            input.value = "";
+            renderCategories();
+        }
+
+        function deleteCategory(catName) {
+            const data = getTenantData();
+            data.categories = data.categories.filter(c => c !== catName);
+            delete data.mappings[catName];
+            saveTenantData(data);
+            renderCategories();
+        }
+
+        // --- TRABAJO DE CLASIFICACIÓN CON DRAG & DROP PANTALLA 3 ---
+        function renderClassification() {
+            const data = getTenantData();
+            const select = document.getElementById("classificationCategorySelect");
+            
+            // Llenar selector si cambió estructuralmente
+            const currentVal = select.value;
+            select.innerHTML = "";
+            data.categories.forEach(c => {
+                const opt = document.createElement("option"); opt.value = c; opt.textContent = c;
+                select.appendChild(opt);
+            });
+            if(currentVal && data.categories.includes(currentVal)) select.value = currentVal;
+
+            const targetCategory = select.value;
+            const libPanel = document.getElementById("classificationLibraryPanel");
+            const catPanel = document.getElementById("classificationCategoryContent");
+            
+            libPanel.innerHTML = "";
+            catPanel.innerHTML = "";
+
+            if(!targetCategory) {
+                catPanel.innerHTML = `<p class="text-sm text-gray-500">Crea primero una categoría para clasificar.</p>`;
+                return;
+            }
+
+            const allTracks = getGlobalLibrary();
+            const mappedIds = data.mappings[targetCategory] || [];
+
+            // Render Panel Izquierda
+            allTracks.forEach(t => {
+                const item = document.createElement("div");
+                item.className = "bg-gray-900 p-3 rounded border border-gray-800 flex justify-between items-center cursor-grab active:cursor-grabbing hover:border-gray-700";
+                item.draggable = true;
+                item.ondragstart = (e) => { draggedAudioId = t.id; };
+                item.innerHTML = `
+                    <div>
+                        <p class="text-sm font-semibold text-white">${t.title}</p>
+                        <p class="text-xs text-gray-400">${t.artist}</p>
+                    </div>
+                    <button onclick="forceMapTrack('${t.id}')" class="text-xs bg-blue-900 text-blue-300 px-2 py-1 rounded hover:bg-blue-800">Agregar →</button>
+                `;
+                libPanel.appendChild(item);
+            });
+
+            // Render Panel Derecha
+            if(mappedIds.length === 0) {
+                catPanel.innerHTML = `<div class="text-xs text-gray-500 text-center py-8">Zona de soltar. Arrastra audios aquí.</div>`;
+            } else {
+                mappedIds.forEach(id => {
+                    const t = allTracks.find(x => x.id === id);
+                    if(!t) return;
+                    const item = document.createElement("div");
+                    item.className = "bg-blue-950/40 p-3 rounded border border-blue-900/60 flex justify-between items-center";
+                    item.innerHTML = `
+                        <div>
+                            <p class="text-sm font-semibold text-blue-200">${t.title}</p>
+                            <p class="text-xs text-gray-400">${t.artist}</p>
+                        </div>
+                        <button onclick="unmapTrack('${t.id}')" class="text-xs text-red-400 hover:underline">Quitar</button>
+                    `;
+                    catPanel.appendChild(item);
+                });
+            }
+        }
+
+        function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add("drag-over"); }
+        function dragLeave(e) { e.currentTarget.classList.remove("drag-over"); }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+            if(draggedAudioId) forceMapTrack(draggedAudioId);
+        }
+
+        function forceMapTrack(id) {
+            const data = getTenantData();
+            const targetCategory = document.getElementById("classificationCategorySelect").value;
+            if(!targetCategory) return;
+            if(!data.mappings[targetCategory].includes(id)) {
+                data.mappings[targetCategory].push(id);
+                saveTenantData(data);
+                renderClassification();
+            }
+            draggedAudioId = null;
+        }
+
+        function unmapTrack(id) {
+            const data = getTenantData();
+            const targetCategory = document.getElementById("classificationCategorySelect").value;
+            data.mappings[targetCategory] = data.mappings[targetCategory].filter(x => x !== id);
+            saveTenantData(data);
+            renderClassification();
+        }
+
+        // --- CONSTRUCCIÓN DE RELOJES MUSICALES PANTALLA 4 ---
+        function renderClockBuilder() {
+            const data = getTenantData();
+            const clockSelect = document.getElementById("activeClockSelector");
+            
+            const currentVal = clockSelect.value;
+            clockSelect.innerHTML = "";
+            Object.keys(data.clocks).forEach(c => {
+                const opt = document.createElement("option"); opt.value = c; opt.textContent = c;
+                clockSelect.appendChild(opt);
+            });
+            if(currentVal && data.clocks[currentVal]) clockSelect.value = currentVal;
+
+            // Render fuentes de categorías
+            const srcContainer = document.getElementById("clockCategoriesSource");
+            srcContainer.innerHTML = "";
+            data.categories.forEach(cat => {
+                const item = document.createElement("div");
+                item.className = "bg-gray-900 p-2 rounded border border-gray-800 text-xs text-gray-300 cursor-grab hover:bg-gray-800";
+                item.draggable = true;
+                item.ondragstart = () => { draggedCategoryId = cat; };
+                item.innerHTML = `<div class="flex justify-between items-center"><span>${cat}</span><button onclick="addCategoryToClock('${cat}')" class="text-[10px] text-blue-400 font-bold">+</button></div>`;
+                srcContainer.appendChild(item);
+            });
+
+            // Render dropzone del reloj activo
+            const dropZone = document.getElementById("clockDropZone");
+            dropZone.innerHTML = "";
+            const activeClock = clockSelect.value;
+
+            if(!activeClock) {
+                dropZone.innerHTML = `<p class="text-sm text-gray-500 m-auto text-center">Crea un estructura de reloj para empezar a secuenciar.</p>`;
+                return;
+            }
+
+            const sequentialArr = data.clocks[activeClock] || [];
+            if(sequentialArr.length === 0) {
+                dropZone.innerHTML = `<p class="text-xs text-gray-500 m-auto text-center">Arrastra bloques de categorías aquí para armar la línea de tiempo de reproducción.</p>`;
+            } else {
+                sequentialArr.forEach((catName, index) => {
+                    const block = document.createElement("div");
+                    block.className = "bg-gray-800 px-4 py-2 rounded-lg border border-gray-700 flex justify-between items-center text-sm text-white";
+                    block.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs text-gray-500 bg-gray-900 px-1.5 py-0.5 rounded">Pos ${index+1}</span>
+                            <span class="font-semibold">${catName}</span>
+                        </div>
+                        <button onclick="removeClockBlock(${index})" class="text-gray-500 hover:text-red-400"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                    `;
+                    dropZone.appendChild(block);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        function createNewClock() {
+            const input = document.getElementById("newClockName");
+            const name = input.value.trim();
+            if(!name) return;
+            const data = getTenantData();
+            if(data.clocks[name]) return;
+            data.clocks[name] = [];
+            saveTenantData(data);
+            input.value = "";
+            renderClockBuilder();
+        }
+
+        function handleClockDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove("drag-over");
+            if(draggedCategoryId) addCategoryToClock(draggedCategoryId);
+        }
+
+        function addCategoryToClock(catName) {
+            const data = getTenantData();
+            const activeClock = document.getElementById("activeClockSelector").value;
+            if(!activeClock) return;
+            data.clocks[activeClock].push(catName);
+            saveTenantData(data);
+            draggedCategoryId = null;
+            renderClockBuilder();
+        }
+
+        function removeClockBlock(index) {
+            const data = getTenantData();
+            const activeClock = document.getElementById("activeClockSelector").value;
+            data.clocks[activeClock].splice(index, 1);
+            saveTenantData(data);
+            renderClockBuilder();
+        }
+
+        // --- GESTIÓN DE CANALES PANTALLA 5 ---
+        function renderChannels() {
+            const data = getTenantData();
+            const container = document.getElementById("channelsList");
+            container.innerHTML = "";
+
+            if(data.channels.length === 0) {
+                container.innerHTML = `<div class="text-sm text-gray-500 col-span-2">No existen canales registrados.</div>`;
+                return;
+            }
+
+            data.channels.forEach(ch => {
+                const card = document.createElement("div");
+                card.className = "bg-gray-900 border border-gray-800 p-4 rounded-lg flex justify-between items-center";
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-950 text-blue-400 rounded-lg"><i data-lucide="radio" class="w-4 h-4"></i></div>
+                        <div><h4 class="font-bold text-white">${ch}</h4></div>
+                    </div>
+                    <button onclick="deleteChannel('${ch}')" class="text-xs text-red-400 hover:underline">Remover</button>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function createNewChannel() {
+            const input = document.getElementById("newChannelName");
+            const name = input.value.trim();
+            if(!name) return;
+            const data = getTenantData();
+            if(data.channels.includes(name)) return;
+            data.channels.push(name);
+            saveTenantData(data);
+            input.value = "";
+            renderChannels();
+        }
+
+        function deleteChannel(name) {
+            const data = getTenantData();
+            data.channels = data.channels.filter(c => c !== name);
+            // Limpiar su programación asociada
+            data.schedule = data.schedule.filter(s => s.channel !== name);
+            saveTenantData(data);
+            renderChannels();
+        }
+
+        // --- PARRILLA DE PROGRAMACIÓN SEMANAL PANTALLA 6 ---
+        function renderSchedule() {
+            const data = getTenantData();
+            const chSelect = document.getElementById("schedChannel");
+            const clSelect = document.getElementById("schedClock");
+            
+            // Llenar Selectores
+            const lastCh = chSelect.value;
+            chSelect.innerHTML = "";
+            data.channels.forEach(c => chSelect.innerHTML += `<option value="${c}">${c}</option>`);
+            if(lastCh && data.channels.includes(lastCh)) chSelect.value = lastCh;
+
+            clSelect.innerHTML = "";
+            Object.keys(data.clocks).forEach(c => clSelect.innerHTML += `<option value="${c}">${c}</option>`);
+
+            const currentChannel = chSelect.value;
+            const gridBody = document.getElementById("scheduleGridBody");
+            gridBody.innerHTML = "";
+
+            if(!currentChannel) {
+                gridBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500">Registra un canal a la izquierda para estructurar su programación horaria.</td></tr>`;
+                return;
+            }
+
+            // Construcción matriz de bloques de 4 horas en MVP para usabilidad limpia (00-04, 04-08, 08-12, 12-16, 16-20, 20-24)
+            const blocks = [
+                { s: 0, e: 4, label: "00:00 - 04:00" },
+                { s: 4, e: 8, label: "04:00 - 08:00" },
+                { s: 8, e: 12, label: "08:00 - 12:00" },
+                { s: 12, e: 16, label: "12:00 - 16:00" },
+                { s: 16, e: 20, label: "16:00 - 20:00" },
+                { s: 20, e: 24, label: "20:00 - 00:00" }
+            ];
+
+            const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+            blocks.forEach(b => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-gray-800 hover:bg-gray-900/30";
+                
+                let cellsHtml = `<td class="p-2 font-mono font-bold text-gray-400 bg-gray-900/50">${b.label}</td>`;
+                
+                days.forEach(day => {
+                    // Buscar si hay regla que colisione o calce en este rango
+                    const match = data.schedule.find(s => s.channel === currentChannel && s.day === day && s.start <= b.s && s.end >= b.e);
+                    if(match) {
+                        cellsHtml += `<td class="p-2 text-center bg-blue-950/40 border border-gray-800 text-blue-300 font-semibold rounded relative group">
+                            ${match.clock}
+                            <button onclick="removeScheduleBlock('${match.id}')" class="absolute top-0 right-0 bg-red-600 text-white text-[9px] px-1 rounded hidden group-hover:block">X</button>
+                        </td>`;
+                    } else {
+                        cellsHtml += `<td class="p-2 text-center text-gray-600 border border-gray-800 font-mono">-</td>`;
+                    }
+                });
+
+                tr.innerHTML = cellsHtml;
+                gridBody.appendChild(tr);
+            });
+        }
+
+        function saveScheduleBlock() {
+            const data = getTenantData();
+            const channel = document.getElementById("schedChannel").value;
+            const day = document.getElementById("schedDay").value;
+            const start = parseInt(document.getElementById("schedStart").value);
+            const end = parseInt(document.getElementById("schedEnd").value);
+            const clock = document.getElementById("schedClock").value;
+
+            if(!channel || !clock) { alert("Configura canales y relojes previamente."); return; }
+            if(start >= end) { alert("La hora de inicio debe ser menor a la hora de fin."); return; }
+
+            const block = { id: "sch_" + Date.now(), channel, day, start, end, clock };
+            data.schedule.push(block);
+            saveTenantData(data);
+            renderSchedule();
+        }
+
+        function removeScheduleBlock(id) {
+            const data = getTenantData();
+            data.schedule = data.schedule.filter(s => s.id !== id);
+            saveTenantData(data);
+            renderSchedule();
+        }
+
+        // --- REPRODUCTOR AUTOMÁTICO EN COMPLETO TIEMPO REAL PANTALLA 7 ---
+        function renderPlayerView() {
+            const data = getTenantData();
+            const selectContainer = document.getElementById("screen-player");
+            
+            // Inyectar selector dinámico de canal de escucha si no existe
+            let channelSelector = document.getElementById("playerChannelListeningSelect");
+            if(!channelSelector) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "bg-gray-950 p-4 rounded-xl border border-gray-800 flex items-center gap-3 mb-4";
+                wrapper.innerHTML = `
+                    <label class="text-sm text-gray-300 font-medium">Traccionar Emisión del Canal:</label>
+                    <select id="playerChannelListeningSelect" onchange="buildEngineQueue()" class="bg-gray-900 border border-gray-700 text-white rounded px-3 py-1.5 text-sm"></select>
+                `;
+                selectContainer.insertBefore(wrapper, selectContainer.childNodes[2]);
+                channelSelector = document.getElementById("playerChannelListeningSelect");
+            }
+
+            channelSelector.innerHTML = "";
+            data.channels.forEach(c => channelSelector.innerHTML += `<option value="${c}">${c}</option>`);
+            
+            buildEngineQueue();
+        }
+
+        // CORE LOGIC: CALCULO DE COLA DINÁMICA SEGÚN DÍA Y RELOJ GOBERNANTE
+        function buildEngineQueue() {
+            const data = getTenantData();
+            const listenChannel = document.getElementById("playerChannelListeningSelect").value;
+            const queueListContainer = document.getElementById("playerQueueList");
+            
+            queueListContainer.innerHTML = "";
+            if(!listenChannel) {
+                document.getElementById("playerChannelBadge").textContent = "SIN CANAL";
+                return;
+            }
+
+            document.getElementById("playerChannelBadge").textContent = listenChannel.toUpperCase();
+
+            // Identificar día y hora real actual (Simulado bajo especificación estricta)
+            const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            const now = new Date();
+            const currentDayName = daysMap[now.getDay()];
+            const currentHour = now.getHours();
+
+            // Encontrar reloj programado en la parrilla
+            const activeRule = data.schedule.find(s => s.channel === listenChannel && s.day === currentDayName && currentHour >= s.start && currentHour < s.end);
+
+            if(!activeRule) {
+                document.getElementById("playerActiveClock").textContent = "Sin Reloj a esta Hora";
+                queueListContainer.innerHTML = `<p class="text-xs text-gray-500 p-4">No hay un reloj asignado para el día de hoy a las ${currentHour}:00 horas en este canal.</p>`;
+                return;
+            }
+
+            const clockName = activeRule.clock;
+            document.getElementById("playerActiveClock").textContent = clockName;
+
+            const categorySequence = data.clocks[clockName] || [];
+            if(categorySequence.length === 0) {
+                queueListContainer.innerHTML = `<p class="text-xs text-gray-500 p-4">El reloj [${clockName}] no tiene categorías asignadas.</p>`;
+                return;
+            }
+
+            // Generar la cola en runtime de ejecución secuencial basado en lógica aleatoria de categorías
+            currentSequenceQueue = [];
+            const globalLibrary = getGlobalLibrary();
+
+            // Construir un ciclo de reproducción visible de 10 pasos seguidos según patrón de reloj
+            for(let i = 0; i < 10; i++) {
+                const targetCategory = categorySequence[i % categorySequence.length];
+                const poolTrackIds = data.mappings[targetCategory] || [];
+                
+                let selectedTrack = null;
+                if(poolTrackIds.length > 0) {
+                    // Tracción aleatoria estricta dentro de la categoría
+                    const randomId = poolTrackIds[Math.floor(Math.random() * poolTrackIds.length)];
+                    selectedTrack = globalLibrary.find(x => x.id === randomId);
+                }
+
+                currentSequenceQueue.push({
+                    category: targetCategory,
+                    track: selectedTrack // puede ser null si está vacía
+                });
+            }
+
+            currentQueuePointer = 0;
+            renderQueueUI();
+            
+            // Si el motor está detenido, cargar la primera pista de inmediato
+            if(AUDIO_ENGINE.paused && currentSequenceQueue.length > 0) {
+                loadTrack(0);
+            }
+        }
+
+        function renderQueueUI() {
+            const container = document.getElementById("playerQueueList");
+            container.innerHTML = "";
+            currentSequenceQueue.forEach((item, idx) => {
+                if(idx < currentQueuePointer) return;
+                const div = document.createElement("div");
+                div.className = `p-2.5 rounded border text-xs flex justify-between items-center ${idx === currentQueuePointer ? 'bg-blue-950/60 border-blue-800 text-blue-200 font-bold' : 'bg-gray-900 border-gray-800'}`;
+                div.innerHTML = `
+                    <div>
+                        <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-800 mr-2 text-gray-400">${item.category}</span>
+                        <span>${item.track ? item.track.title : '(Categoría vacía - Sin Audio)'}</span>
+                    </div>
+                    <span class="text-gray-500 font-mono">${item.track ? item.track.duration : '--:--'}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function loadTrack(pointer) {
+            if(pointer >= currentSequenceQueue.length) {
+                buildEngineQueue(); // Regenerar ciclo cíclico
+                return;
+            }
+
+            const item = currentSequenceQueue[pointer];
+            if(!item || !item.track) {
+                // Forzar salto rápido si la categoría no tiene audios mapeados
+                document.getElementById("playerCurrentTitle").textContent = `Vacío: ${item.category}`;
+                document.getElementById("playerCurrentArtist").textContent = "Mapea audios en clasificación";
+                document.getElementById("playerCurrentCategory").textContent = item.category;
+                setTimeout(() => { skipTrack(); }, 2500);
+                return;
+            }
+
+            document.getElementById("playerCurrentTitle").textContent = item.track.title;
+            document.getElementById("playerCurrentArtist").textContent = item.track.artist;
+            document.getElementById("playerCurrentCategory").textContent = item.category;
+            AUDIO_ENGINE.src = item.track.url;
+            AUDIO_ENGINE.load();
+        }
+
+        function togglePlayback() {
+            const playBtn = document.getElementById("playBtn");
+            if(AUDIO_ENGINE.paused) {
+                AUDIO_ENGINE.play().then(() => {
+                    playBtn.innerHTML = `<i data-lucide="pause" class="w-6 h-6"></i>`;
+                    lucide.createIcons();
+                }).catch(err => alert("Por seguridad del navegador, interactúa primero con la página para permitir la reproducción de audios externos."));
+            } else {
+                AUDIO_ENGINE.pause();
+                playBtn.innerHTML = `<i data-lucide="play" class="w-6 h-6"></i>`;
+                lucide.createIcons();
+            }
+        }
+
+        function skipTrack() {
+            currentQueuePointer++;
+            renderQueueUI();
+            loadTrack(currentQueuePointer);
+            AUDIO_ENGINE.play().catch(()=>{});
+        }
+
+        function trackEnded() {
+            skipTrack();
+        }
+
+        function updateAudioProgress() {
+            if(!AUDIO_ENGINE.duration) return;
+            const pct = (AUDIO_ENGINE.currentTime / AUDIO_ENGINE.duration) * 100;
+            document.getElementById("playbackProgressBar").style.width = `${pct}%`;
+
+            // Formatear tiempo restante
+            const remaining = AUDIO_ENGINE.duration - AUDIO_ENGINE.currentTime;
+            const mins = Math.floor(remaining / 60);
+            const secs = Math.floor(remaining % 60);
+            document.getElementById("playerTimeRemaining").textContent = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
