@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SONUS AUTOMATION - MVP v1.0</title>
+    <title>SONUS AUTOMATION - MVP v1.0 (Audio Engine Activo)</title>
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/js/lucide.min.js"></script>
     <style>
         :root {
@@ -21,13 +21,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Layout */
         sidebar { width: 280px; background-color: var(--sidebar-bg); padding: 20px; display: flex; flex-direction: column; border-right: 1px solid #1E293B; overflow-y: auto; }
         main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { background-color: var(--sidebar-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1E293B; }
         .content-body { padding: 30px; flex: 1; overflow-y: auto; }
         
-        /* Typography & UI */
         .brand { font-size: 22px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
         .nav-group-title { font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin: 15px 0 5px 10px; font-weight: bold; letter-spacing: 1px; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
@@ -37,146 +35,89 @@
         .card { background-color: var(--bg-card); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 25px; border: 1px solid #2E3A59; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        h2 { font-size: 20px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
-        .subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
         
-        /* Forms & Tables */
+        /* Zona de Carga Drop */
+        .drop-zone { border: 2px dashed var(--primary); background: rgba(58, 134, 255, 0.05); padding: 30px; text-align: center; border-radius: 8px; cursor: pointer; transition: background 0.3s; }
+        .drop-zone:hover { background: rgba(58, 134, 255, 0.15); }
+        
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; }
         input, select { width: 100%; background: #0D1B2A; color: white; border: 1px solid #2E3A59; padding: 10px; border-radius: 6px; font-size: 14px; }
-        input:focus, select:focus { border-color: var(--primary); outline: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; color: var(--text-muted); padding: 12px; border-bottom: 2px solid #2E3A59; font-size: 13px; }
-        td { padding: 12px; border-bottom: 1px solid #2E3A59; font-size: 14px; vertical-align: middle; }
         
-        /* Buttons & Badges */
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; transition: opacity 0.2s; }
-        .btn:hover { opacity: 0.9; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: var(--text-muted); padding: 12px; border-bottom: 2px solid #2E3A59; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #2E3A59; font-size: 14px; }
+        
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
         .btn-primary { background-color: var(--primary); color: white; }
         .btn-secondary { background-color: var(--secondary); color: white; }
         .btn-danger { background-color: var(--danger); color: white; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
         .badge-success { background: rgba(6,214,160,0.2); color: var(--success); }
-        .badge-danger { background: rgba(239,71,111,0.2); color: var(--danger); }
-        .badge-warning { background: rgba(255,183,3,0.2); color: var(--warning); }
-
-        /* Drag and Drop Panels */
-        .panel-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 450px; }
-        .panel { background: #0D1B2A; border: 1px solid #2E3A59; border-radius: 8px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .panel-title { font-weight: bold; font-size: 14px; padding-bottom: 10px; border-bottom: 1px solid #2E3A59; margin-bottom: 10px; color: var(--text-muted); }
-        .drag-item { background: var(--bg-card); padding: 12px; border: 1px solid #2E3A59; border-radius: 6px; cursor: grab; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .drag-item:active { cursor: grabbing; }
-
-        /* Clock Builder */
+        
+        .panel-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 400px; }
+        .panel { background: #0D1B2A; border: 1px solid #2E3A59; border-radius: 8px; padding: 15px; overflow-y: auto; }
+        .drag-item { background: var(--bg-card); padding: 10px; border: 1px solid #2E3A59; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
+        
         .clock-timeline { display: flex; flex-wrap: wrap; gap: 10px; min-height: 80px; background: #0D1B2A; border: 2px dashed #2E3A59; padding: 15px; border-radius: 8px; align-items: center; }
-        .clock-slot { background: var(--secondary); color: white; padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .clock-slot i { cursor: pointer; }
-
-        /* Scheduler Grid */
-        .sched-grid { display: grid; grid-template-columns: 100px 1fr; gap: 10px; background: #0D1B2A; padding: 15px; border-radius: 8px; }
-        .sched-day-row { display: contents; }
-        .sched-label { font-weight: bold; font-size: 13px; display: flex; align-items: center; color: var(--text-muted); border-bottom: 1px solid #2E3A59; padding: 10px 0; }
-        .sched-slots { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #2E3A59; padding: 10px 0; }
-        .sched-card { background: var(--bg-card); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 4px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-
-        /* Player View Elements */
-        .player-main { background: linear-gradient(135deg, #1C2541 0%, #0D1B2A 100%); border: 1px solid var(--primary); padding: 30px; border-radius: 12px; text-align: center; }
-        .track-display { margin: 20px 0; }
-        .track-title { font-size: 28px; font-weight: bold; color: var(--success); margin-bottom: 5px; }
-        .track-artist { font-size: 18px; color: var(--text-muted); }
-        .track-meta-badge { display: inline-flex; gap: 15px; margin-top: 15px; }
-        .player-progress { background: #0B132B; height: 6px; border-radius: 3px; width: 80%; margin: 20px auto; overflow: hidden; position: relative; }
-        .progress-bar { background: var(--success); height: 100%; width: 0%; transition: width 1s linear; }
-        .time-rem { font-family: monospace; font-size: 20px; color: var(--warning); margin-top: 10px; }
+        .clock-slot { background: var(--secondary); padding: 6px 12px; border-radius: 4px; font-size: 12px; display: flex; align-items: center; gap: 8px; }
+        
+        /* REPRODUCTOR HARDWARE REAL */
+        .player-main { background: linear-gradient(135deg, #1C2541 0%, #0D1B2A 100%); border: 2px solid var(--success); padding: 35px; border-radius: 12px; text-align: center; }
+        .track-title { font-size: 26px; font-weight: bold; color: var(--success); }
+        .player-progress { background: #0B132B; height: 8px; border-radius: 4px; width: 100%; margin: 20px 0; overflow: hidden; }
+        .progress-bar { background: var(--success); height: 100%; width: 0%; }
     </style>
 </head>
 <body>
 
     <sidebar>
-        <div class="brand"><i data-lucide="radio"></i> SONUS AUTOMATION</div>
-        
+        <div class="brand"><i data-lucide="radio"></i> SONUS ENGINE</div>
         <div class="nav-group-title">SaaS Global</div>
         <div class="nav-item active" id="btn-nav-p0" onclick="navTo('p0')"><i data-lucide="shield"></i> P0 - Admin Maestro</div>
-        
-        <div class="nav-group-title">Módulos de Cliente</div>
+        <div class="nav-group-title">Módulos Cliente</div>
         <div class="nav-item" id="btn-nav-p1" onclick="navTo('p1')"><i data-lucide="music"></i> P1 - Biblioteca</div>
         <div class="nav-item" id="btn-nav-p2" onclick="navTo('p2')"><i data-lucide="folder-heart"></i> P2 - Categorías</div>
         <div class="nav-item" id="btn-nav-p3" onclick="navTo('p3')"><i data-lucide="shuffle"></i> P3 - Clasificación</div>
-        <div class="nav-item" id="btn-nav-p4" onclick="navTo('p4')"><i data-lucide="watch"></i> P4 - Relojes Musicales</div>
+        <div class="nav-item" id="btn-nav-p4" onclick="navTo('p4')"><i data-lucide="watch"></i> P4 - Relojes</div>
         <div class="nav-item" id="btn-nav-p5" onclick="navTo('p5')"><i data-lucide="layers"></i> P5 - Canales</div>
         <div class="nav-item" id="btn-nav-p6" onclick="navTo('p6')"><i data-lucide="calendar"></i> P6 - Programación</div>
         <div class="nav-item" id="btn-nav-p7" onclick="navTo('p7')"><i data-lucide="play-circle"></i> P7 - Reproductor</div>
-
-        <div style="margin-top: auto; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 6px; font-size: 12px;">
-            <span style="color: var(--text-muted);">Cliente Activo simulado:</span>
-            <div id="sidebar-client-badge" style="font-weight: bold; color: var(--primary); margin-top: 2px;">Ninguno (Seleccione en P0)</div>
-        </div>
     </sidebar>
 
     <main>
         <header>
-            <div id="current-screen-title" style="font-weight: bold; font-size: 18px;">Pantalla 0 - Administración General</div>
+            <div id="current-screen-title" style="font-weight: bold;">Pantalla 0 - Administración General</div>
             <div>
-                <select id="global-client-selector" onchange="changeActiveClient()" style="width: auto; padding: 5px 10px;">
-                    </select>
+                <select id="global-client-selector" onchange="changeActiveClient()" style="width: auto; padding: 5px;"></select>
             </div>
         </header>
 
         <div class="content-body">
-
             <div id="screen-p0" class="screen-view">
                 <div class="grid-2">
                     <div class="card">
-                        <h2><i data-lucide="user-plus"></i> Registrar Nuevo Cliente</h2>
-                        <p class="subtitle">Aísla por completo la configuración operativa de cada empresa.</p>
-                        <div class="form-group">
-                            <label>Nombre del Cliente / Empresa</label>
+                        <h2><i data-lucide="user-plus"></i> Registrar Cliente</h2>
+                        <div class="form-group" style="margin-top:15px;">
+                            <label>Nombre de la Empresa</label>
                             <input type="text" id="p0-client-name" placeholder="Ej. Supermercado Aranjuez">
                         </div>
-                        <div class="form-group">
-                            <label>Plan Contratado</label>
-                            <select id="p0-client-plan">
-                                <option value="Básico">Básico</option>
-                                <option value="Profesional">Profesional</option>
-                                <option value="Empresarial">Empresarial</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary" onclick="createClient()">Crear Cuenta de Cliente</button>
+                        <button class="btn btn-primary" onclick="createClient()">Crear Cliente</button>
                     </div>
-
                     <div class="card">
-                        <h2><i data-lucide="upload"></i> Carga en Biblioteca Musical Global</h2>
-                        <p class="subtitle">Solo tú como Admin Maestro puedes añadir canciones. Serán compartidas por todos.</p>
-                        <div class="form-group">
-                            <label>Simular Carga de Archivo</label>
-                            <select id="p0-upload-preset">
-                                <option value="song1">Canción Pop: Taylor Swift - Blank Space (3:51)</option>
-                                <option value="song2">Canción Rock: AC/DC - Back In Black (4:15)</option>
-                                <option value="song3">Canción 80s: Michael Jackson - Billie Jean (4:54)</option>
-                                <option value="song4">Canción 90s: Nirvana - Smells Like Teen Spirit (5:01)</option>
-                                <option value="ad1">Anuncio Comercial: Liquidación de Invierno (0:30)</option>
-                                <option value="ad2">Anuncio Comercial: Oferta Carnes y Verduras (0:45)</option>
-                                <option value="jingle1">Jingle: Identificador Sonoro Aranjuez (0:10)</option>
-                            </select>
+                        <h2><i data-lucide="upload-cloud"></i> Cargar Audio Real a Biblioteca Global</h2>
+                        <p class="subtitle" style="margin-bottom:10px;">Arrastra archivos .mp3 reales. Se procesarán y almacenarán localmente.</p>
+                        <div class="drop-zone" onclick="document.getElementById('global-audio-file').click()">
+                            <i data-lucide="file-audio" style="width:40px; height:40px; margin-bottom:10px; color:var(--primary);"></i>
+                            <p>Arrastra aquí tus archivos MP3 o haz clic para buscar</p>
+                            <input type="file" id="global-audio-file" accept="audio/*" style="display:none;" multiple onchange="handleFileSelect(event)">
                         </div>
-                        <button class="btn btn-secondary" onclick="uploadGlobalTrack()">Simular Subida Automática de Metadatos</button>
                     </div>
                 </div>
-
                 <div class="card">
-                    <h2>Clientes Registrados de la Plataforma SaaS</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CLIENTE</th>
-                                <th>PLAN</th>
-                                <th>FECHA CREACIÓN</th>
-                                <th>VENCIMIENTO</th>
-                                <th>ESTADO</th>
-                                <th>ACCIONES</th>
-                            </tr>
-                        </thead>
+                    <h3>Clientes en el Sistema</h3>
+                    <table style="margin-top:15px;">
+                        <thead><tr><th>CLIENTE</th><th>ESTADO</th><th>ACCIONES</th></tr></thead>
                         <tbody id="p0-clients-table"></tbody>
                     </table>
                 </div>
@@ -184,22 +125,9 @@
 
             <div id="screen-p1" class="screen-view" style="display:none;">
                 <div class="card">
-                    <h2>Biblioteca Unificada de Audios</h2>
-                    <p class="subtitle">Muestra la Biblioteca Global unificada + los Anuncios/Jingles propios cargados por el cliente actual.</p>
-                    <div style="margin-bottom: 15px; display: flex; gap: 10px;">
-                        <input type="text" id="p1-search" placeholder="Buscar por título o artista..." oninput="renderP1()" style="max-width: 300px;">
-                        <button class="btn btn-primary btn-sm" onclick="simularAnuncioPropio()">+ Subir Anuncio Propio del Cliente</button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>TÍTULO</th>
-                                <th>ARTISTA</th>
-                                <th>DURACIÓN</th>
-                                <th>PROPIEDAD / ORIGEN</th>
-                                <th>ACCIONES</th>
-                            </tr>
-                        </thead>
+                    <h2>Biblioteca Unificada (Audios Reales)</h2>
+                    <table style="margin-top:15px;">
+                        <thead><tr><th>TÍTULO</th><th>DURACIÓN</th><th>PROPIEDAD</th></tr></thead>
                         <tbody id="p1-library-table"></tbody>
                     </table>
                 </div>
@@ -207,34 +135,25 @@
 
             <div id="screen-p2" class="screen-view" style="display:none;">
                 <div class="card">
-                    <h2>Crear Categorías Personalizadas</h2>
-                    <p class="subtitle">Las categorías pertenecen exclusivamente al cliente activo y comienzan vacías.</p>
-                    <div class="form-group" style="display:flex; gap:10px; max-width:500px;">
-                        <input type="text" id="p2-cat-name" placeholder="Ej. Rock, Pop, Anuncios, 80s">
+                    <h2>Gestionar Categorías</h2>
+                    <div class="form-group" style="display:flex; gap:10px; margin-top:15px;">
+                        <input type="text" id="p2-cat-name" placeholder="Ej. Pop, Rock, Anuncios">
                         <button class="btn btn-primary" onclick="createCategory()">Crear</button>
                     </div>
-                    <h3 style="margin-top:20px; font-size:15px; margin-bottom:10px;">Mis Categorías Actuales:</h3>
-                    <div id="p2-categories-list" class="grid-3"></div>
+                    <div id="p2-categories-list" class="grid-3" style="margin-top:20px;"></div>
                 </div>
             </div>
 
             <div id="screen-p3" class="screen-view" style="display:none;">
                 <div class="card">
-                    <h2>Clasificación y Relación de Contenidos</h2>
-                    <p class="subtitle">Selecciona una categoría. Arrastra los elementos desde la Biblioteca (Izquierda) hacia la Categoría (Derecha).</p>
-                    
-                    <div class="form-group" style="max-width:300px;">
-                        <label>Seleccionar Categoría de Trabajo</label>
+                    <h2>Clasificación de Audios</h2>
+                    <div class="form-group" style="max-width:300px; margin-bottom:20px;">
+                        <label>Seleccionar Categoría</label>
                         <select id="p3-category-selector" onchange="renderP3()"></select>
                     </div>
-
                     <div class="panel-container">
-                        <div class="panel" id="p3-library-panel" ondragover="allowDrop(event)" ondrop="dropToLibrary(event)">
-                            <div class="panel-title">Biblioteca Completa (Arrastra o haz clic en +)</div>
-                            </div>
-                        <div class="panel" id="p3-category-panel" ondragover="allowDrop(event)" ondrop="dropToCategory(event)">
-                            <div class="panel-title">Audios Dentro de esta Categoría</div>
-                            </div>
+                        <div class="panel" id="p3-library-panel"><h3>Biblioteca</h3></div>
+                        <div class="panel" id="p3-category-panel"><h3>Dentro de la Categoría</h3></div>
                     </div>
                 </div>
             </div>
@@ -242,91 +161,43 @@
             <div id="screen-p4" class="screen-view" style="display:none;">
                 <div class="grid-2">
                     <div class="card">
-                        <h2>Crear Estructura de Reloj</h2>
-                        <p class="subtitle">Define un patrón secuencial de reproducción basado en categorías.</p>
-                        <div class="form-group">
-                            <label>Nombre del Reloj Musical</label>
-                            <input type="text" id="p4-clock-name" placeholder="Ej. Bloque de la Mañana">
-                        </div>
-                        <button class="btn btn-primary" onclick="createClock()">Registrar Reloj Vacío</button>
+                        <h2>Crear Reloj</h2>
+                        <input type="text" id="p4-clock-name" placeholder="Ej. Bloque Mañana" style="margin:15px 0;">
+                        <button class="btn btn-primary" onclick="createClock()">Crear Reloj</button>
                     </div>
-
                     <div class="card">
-                        <h2>Constructor de Secuencia</h2>
-                        <p class="subtitle">Selecciona un reloj y añádele las categorías en orden secuencial.</p>
-                        <div class="form-group" style="display:flex; gap:10px;">
+                        <h2>Añadir a la Secuencia</h2>
+                        <div style="display:flex; gap:10px; margin-top:15px;">
                             <select id="p4-clock-selector" onchange="renderClockTimeline()"></select>
                             <select id="p4-cat-selector"></select>
-                            <button class="btn btn-secondary" onclick="addCategoryToClock()">+ Añadir</button>
+                            <button class="btn btn-secondary" onclick="addCategoryToClock()">Añadir</button>
                         </div>
                     </div>
                 </div>
-
                 <div class="card">
-                    <h3>Línea Temporal de Reproducción del Reloj Seleccionado</h3>
-                    <p class="subtitle">El orden determina la secuencia exacta de salida aleatoria.</p>
-                    <div class="clock-timeline" id="p4-timeline"></div>
+                    <h3>Secuencia Cíclica del Reloj</h3>
+                    <div class="clock-timeline" id="p4-timeline" style="margin-top:15px;"></div>
                 </div>
             </div>
 
             <div id="screen-p5" class="screen-view" style="display:none;">
                 <div class="card">
-                    <h2>Salidas de Programación (Canales)</h2>
-                    <p class="subtitle">Crea las zonas físicas independientes para tu local comercial.</p>
-                    <div class="form-group" style="display:flex; gap:10px; max-width:500px;">
-                        <input type="text" id="p5-channel-name" placeholder="Ej. Salón Principal, Cafetería, Pasillos">
-                        <button class="btn btn-primary" onclick="createChannel()">Crear Canal</button>
+                    <h2>Canales Operativos</h2>
+                    <div style="display:flex; gap:10px; margin:15px 0;">
+                        <input type="text" id="p5-channel-name" placeholder="Ej. Pasillos, Cafetería">
+                        <button class="btn btn-primary" onclick="createChannel()">Crear</button>
                     </div>
-                    <h3 style="margin-top:20px; font-size:15px; margin-bottom:10px;">Canales Operativos:</h3>
                     <div id="p5-channels-list" class="grid-3"></div>
                 </div>
             </div>
 
             <div id="screen-p6" class="screen-view" style="display:none;">
-                <div class="grid-2">
-                    <div class="card">
-                        <h2>Asignar Reloj a Horario</h2>
-                        <p class="subtitle">Planifica qué reloj musical se ejecutará en cada rango de tiempo.</p>
-                        <div class="form-group">
-                            <label>Día de la Semana</label>
-                            <select id="p6-day">
-                                <option value="Lunes">Lunes</option>
-                                <option value="Martes">Martes</option>
-                                <option value="Miércoles">Miércoles</option>
-                                <option value="Jueves">Jueves</option>
-                                <option value="Viernes">Viernes</option>
-                                <option value="Sábado">Sábado</option>
-                                <option value="Domingo">Domingo</option>
-                            </select>
-                        </div>
-                        <div class="grid-2" style="gap:10px; margin-bottom:15px;">
-                            <div>
-                                <label>Hora Inicio</label>
-                                <input type="time" id="p6-start" value="08:00">
-                            </div>
-                            <div>
-                                <label>Hora Fin</label>
-                                <input type="time" id="p6-end" value="12:00">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Canal de Destino</label>
-                            <select id="p6-channel-selector"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Reloj Musical a Ejecutar</label>
-                            <select id="p6-clock-selector"></select>
-                        </div>
-                        <button class="btn btn-primary" onclick="addSchedule()">Guardar Bloque de Programación</button>
-                    </div>
-
-                    <div class="card" style="overflow-x:auto;">
-                        <h2>Calendario de Programación Semanal</h2>
-                        <p class="subtitle">Estructura registrada para el canal seleccionado.</p>
-                        <div class="form-group" style="max-width:200px;">
-                            <select id="p6-filter-channel" onchange="renderP6()"></select>
-                        </div>
-                        <div class="sched-grid" id="p6-calendar-view"></div>
+                <div class="card">
+                    <h2>Programación del Canal</h2>
+                    <div class="grid-3" style="margin-top:15px;">
+                        <select id="p6-channel-selector"></select>
+                        <select id="p6-clock-selector"></select>
+                        <button class="btn btn-primary" onclick="addSchedule()">Asignar Reloj permanentemente</button>
                     </div>
                 </div>
             </div>
@@ -334,793 +205,322 @@
             <div id="screen-p7" class="screen-view" style="display:none;">
                 <div class="grid-2">
                     <div class="player-main">
-                        <span class="badge badge-success" id="player-channel-badge">CANAL: NO SELECCIONADO</span>
-                        <div class="track-display">
-                            <div class="track-title" id="player-title">REPRODUCTOR DETENIDO</div>
-                            <div class="track-artist" id="player-artist">Selecciona un canal para iniciar el flujo automático</div>
-                        </div>
-                        <div class="track-meta-badge">
-                            <span class="badge" style="background:#2E3A59;" id="player-cat-badge">Categoría: --</span>
-                            <span class="badge" style="background:#2E3A59;" id="player-clock-badge">Reloj Origen: --</span>
-                        </div>
-                        <div class="player-progress">
-                            <div class="progress-bar" id="player-progress-bar"></div>
-                        </div>
-                        <div class="time-rem" id="player-time-display">00:00</div>
-                        <div style="margin-top:25px; display:flex; justify-content:center; gap:15px;">
-                            <button class="btn btn-primary" id="player-toggle-btn" onclick="toggleAutoPlayer()"><i data-lucide="play"></i> Iniciar Automatización</button>
-                            <button class="btn btn-secondary" onclick="skipTrack()"><i data-lucide="skip-forward"></i> Siguiente Pista</button>
+                        <div class="track-title" id="player-title">REPRODUCTOR DE HARDWARE REAL</div>
+                        <div id="player-artist" style="color:var(--text-muted); margin-top:5px;">Detenido</div>
+                        
+                        <audio id="real-audio-player" style="display:none;"></audio>
+                        
+                        <div class="player-progress"><div class="progress-bar" id="player-progress-bar"></div></div>
+                        <div style="font-size:24px; color:var(--warning);" id="player-time">00:00</div>
+                        
+                        <div style="margin-top:20px; display:flex; justify-content:center; gap:10px;">
+                            <button class="btn btn-primary" onclick="startHardwarePlayer()">Iniciar Reproducción</button>
+                            <button class="btn btn-secondary" onclick="skipHardwareTrack()">Siguiente</button>
                         </div>
                     </div>
-
                     <div class="card">
-                        <h2>Próximos en Cola de Salida</h2>
-                        <p class="subtitle">Generados dinámicamente siguiendo la secuencia cíclica del Reloj.</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>POSICIÓN</th>
-                                    <th>CATEGORÍA ESPERADA</th>
-                                    <th>TIPO</th>
-                                </tr>
-                            </thead>
-                            <tbody id="player-queue-table"></tbody>
-                        </table>
-                        <div class="form-group" style="margin-top:20px;">
-                            <label>Monitorear Canal Físico</label>
-                            <select id="p7-channel-selector" onchange="initPlayerForChannel()"></select>
-                        </div>
+                        <h3>Canal en Ejecución</h3>
+                        <select id="p7-channel-selector" onchange="initPlayerChannel()" style="margin-top:15px;"></select>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
     <script>
-        // CORE DE DATOS GLOBAL DE LA APLICACIÓN (SIMULACIÓN DE BASE DE DATOS)
-        let DB = {
-            globalLibrary: [
-                { id: "g1", title: "Blank Space", artist: "Taylor Swift", duration: 231, origin: "Global" },
-                { id: "g2", title: "Back In Black", artist: "AC/DC", duration: 255, origin: "Global" },
-                { id: "g3", title: "Billie Jean", artist: "Michael Jackson", duration: 294, origin: "Global" },
-                { id: "g4", title: "Smells Like Teen Spirit", artist: "N Nirvana", duration: 301, origin: "Global" }
-            ],
-            clients: [
-                { id: "c1", name: "Supermercado Aranjuez", plan: "Profesional", status: "Activa", created: "2026-06-01", expires: "2027-06-01" },
-                { id: "c2", name: "Hotel Plaza Vista", plan: "Básico", status: "Suspendida", created: "2026-05-15", expires: "2026-07-15" }
-            ],
-            // Datos aislados por cliente
-            clientData: {
-                "c1": {
-                    customLibrary: [
-                        { id: "prop1", title: "Anuncio Oferta de Carnes", artist: "Aranjuez Producciones", duration: 30, origin: "Propio" }
-                    ],
-                    categories: ["80s", "90s", "Rock", "Pop", "Anuncios"],
-                    categoryRelations: {
-                        "80s": ["g3"],
-                        "90s": ["g4"],
-                        "Rock": ["g2", "g4"],
-                        "Pop": ["g1", "g3"],
-                        "Anuncios": ["prop1"]
-                    },
-                    clocks: [
-                        { id: "clk1", name: "Mañanas Dinámicas", sequence: ["Pop", "Pop", "Anuncios", "Rock", "90s"] }
-                    ],
-                    channels: ["Salón Principal", "Área de Cajas"],
-                    schedule: [
-                        { id: "s1", day: "Lunes", start: "08:00", end: "12:00", channel: "Salón Principal", clockId: "clk1" }
-                    ]
-                },
-                "c2": { customLibrary: [], categories: ["Instrumental"], categoryRelations: {"Instrumental":[]}, clocks: [], channels: [], schedule: [] }
-            }
-        };
-
+        // MOTOR DE BASE DE DATOS LOCAL (PERSISTENCIA DE ARCHIVOS BINARIOS MP3)
+        let indexedDBInstance;
+        let DB = { clients: [{id:"c1", name:"Supermercado Aranjuez"}], songs: [], clientData: {"c1":{categories:[], relations:{}, clocks:[], channels:[], schedule:[]}} };
         let activeClientId = "c1";
-        
-        // ESTADO INTERNO DEL REPRODUCTOR AUTOMÁTICO
-        let playerState = {
-            isPlaying: false,
-            activeChannel: "",
-            activeClockId: "",
-            currentSequenceIndex: 0,
-            currentTrack: null,
-            secondsRemaining: 0,
-            intervalId: null
-        };
+        let currentAudioFileUrl = null;
 
-        // PRESETS DE SUBIDA
-        const UPLOAD_PRESETS = {
-            song1: { title: "Blank Space", artist: "Taylor Swift", duration: 231 },
-            song2: { title: "Back In Black", artist: "AC/DC", duration: 255 },
-            song3: { title: "Billie Jean", artist: "Michael Jackson", duration: 294 },
-            song4: { title: "Smells Like Teen Spirit", artist: "Nirvana", duration: 301 },
-            ad1: { title: "Liquidación de Invierno", artist: "Locución Comercial", duration: 30 },
-            ad2: { title: "Oferta Carnes y Verduras", artist: "Locución Comercial", duration: 45 },
-            jingle1: { title: "Identificador Sonoro Aranjuez", artist: "Jingle Master", duration: 10 }
+        // INICIALIZAR BASE DE DATOS DEL NAVEGADOR
+        const request = window.indexedDB.open("SonusHardwareDB", 1);
+        request.onupgradeneeded = e => {
+            let db = e.target.result;
+            if(!db.objectStoreNames.contains("audios")) db.createObjectStore("audios", {keyPath: "id"});
         };
+        request.onsuccess = e => { indexedDBInstance = e.target.result; loadSongsFromDB(); };
 
-        window.onload = function() {
-            populateClientSelectors();
-            syncSidebarBadge();
-            renderP0();
-            lucide.createIcons();
-        };
+        function saveSongToIndexedDB(id, fileBlob) {
+            let tx = indexedDBInstance.transaction("audios", "readwrite");
+            tx.objectStore("audios").put({id: id, blob: fileBlob});
+        }
 
-        // NAVEGACIÓN SPA NATIVA
+        function loadSongsFromDB() {
+            if (!indexedDBInstance) return;
+            let tx = indexedDBInstance.transaction("audios", "readonly");
+            tx.objectStore("audios").getAll().onsuccess = e => {
+                e.target.result.forEach(item => {
+                    // Reconstruir metadatos mínimos en memoria para la sesión
+                    DB.songs.push({id: item.id, title: item.id.substring(4), duration: 120});
+                });
+                renderP1();
+            };
+        }
+
+        // CONTROLADOR DE CARGA DE AUDIO HARDWARE REAL
+        function handleFileSelect(e) {
+            let files = e.target.files;
+            for(let file of files) {
+                let trackId = "aud_" + file.name;
+                // Guardar archivo binario real directamente en la base de datos local
+                saveSongToIndexedDB(trackId, file);
+
+                // Obtener duración dinámica real usando un elemento de audio temporal en el navegador
+                let tmpAudio = new Audio();
+                tmpAudio.src = URL.createObjectURL(file);
+                tmpAudio.onloadedmetadata = () => {
+                    DB.songs.push({ id: trackId, title: file.name, duration: Math.floor(tmpAudio.duration) });
+                    renderP1();
+                };
+            }
+            alert("¡Archivos cargados, decodificados y guardados con éxito en el Cerebro local!");
+        }
+
+        // ==========================================
+        // SISTEMA SPA NATIVO Y NAVEGACIÓN
+        // ==========================================
         function navTo(screen) {
             document.querySelectorAll('.screen-view').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
             document.getElementById(`screen-${screen}`).style.display = 'block';
             document.getElementById(`btn-nav-${screen}`).classList.add('active');
             
-            const titles = {
-                p0: "Pantalla 0 - Administración General (Solo Propietario SaaS)",
-                p1: "Pantalla 1 - Biblioteca Unificada",
-                p2: "Pantalla 2 - Gestión de Categorías",
-                p3: "Pantalla 3 - Clasificación y Relaciones (Drag & Drop)",
-                p4: "Pantalla 4 - Estructura de Relojes Musicales",
-                p5: "Pantalla 5 - Canales de Salida Física",
-                p6: "Pantalla 6 - Programación Horaria Semanal",
-                p7: "Pantalla 7 - Reproductor Automatizado Inteligente"
-            };
-            document.getElementById('current-screen-title').innerText = titles[screen];
-            
-            // Disparadores de renderización de pantallas
-            if (screen === 'p1') renderP1();
-            if (screen === 'p2') renderP2();
-            if (screen === 'p3') renderP3();
-            if (screen === 'p4') renderP4();
-            if (screen === 'p5') renderP5();
-            if (screen === 'p6') renderP6();
-            if (screen === 'p7') renderP7();
-        }
-
-        // CONTROL DE CUENTAS E ISLAMIENTO COGNITIVO
-        function changeActiveClient() {
-            activeClientId = document.getElementById('global-client-selector').value;
-            syncSidebarBadge();
-            // Refrescar pantalla actual
-            const activeNav = document.querySelector('.nav-item.active').id;
-            const screenCode = activeNav.replace('btn-nav-', '');
-            navTo(screenCode);
-        }
-
-        function syncSidebarBadge() {
-            const client = DB.clients.find(c => c.id === activeClientId);
-            const badge = document.getElementById('sidebar-client-badge');
-            if (client) {
-                badge.innerText = `${client.name} (${client.status})`;
-                badge.style.color = client.status === 'Activa' ? 'var(--success)' : 'var(--danger)';
-            } else {
-                badge.innerText = "Ninguno";
-            }
-        }
-
-        function populateClientSelectors() {
-            const selector = document.getElementById('global-client-selector');
-            selector.innerHTML = '';
-            DB.clients.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.innerText = `Simular sesión: ${c.name}`;
-                if(c.id === activeClientId) opt.selected = true;
-                selector.appendChild(opt);
-            });
-        }
-
-        // ==========================================
-        // LÓGICA PANTALLA 0: ADMINISTRADOR MAESTRO
-        // ==========================================
-        function renderP0() {
-            const tbody = document.getElementById('p0-clients-table');
-            tbody.innerHTML = '';
-            DB.clients.forEach(c => {
-                const tr = document.createElement('tr');
-                let statusBadge = `<span class="badge badge-success">Activa</span>`;
-                if(c.status === 'Suspendida') statusBadge = `<span class="badge badge-warning">Suspendida</span>`;
-                if(c.status === 'Bloqueada') statusBadge = `<span class="badge badge-danger">Bloqueada</span>`;
-
-                tr.innerHTML = `
-                    <td><strong>${c.name}</strong></td>
-                    <td><span class="badge" style="background:#2E3A59;">${c.plan}</span></td>
-                    <td>${c.created}</td>
-                    <td>${c.expires}</td>
-                    <td>${statusBadge}</td>
-                    <td>
-                        <button class="btn btn-action btn-sm" style="background:#2E3A59;" onclick="toggleClientStatus('${c.id}')">Estado</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')"><i data-lucide="trash-2"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            lucide.createIcons();
+            if(screen === 'p1') renderP1();
+            if(screen === 'p2') renderP2();
+            if(screen === 'p3') renderP3();
+            if(screen === 'p4') renderP4();
+            if(screen === 'p5') renderP5();
+            if(screen === 'p6') renderP6();
+            if(screen === 'p7') renderP7();
         }
 
         function createClient() {
-            const name = document.getElementById('p0-client-name').value.trim();
-            const plan = document.getElementById('p0-client-plan').value;
-            if(!name) return alert("Ingresa el nombre del cliente.");
-            
-            const newId = "c_" + Date.now();
-            DB.clients.push({
-                id: newId, name: name, plan: plan, status: "Activa", created: "2026-06-29", expires: "2027-06-29"
-            });
-            DB.clientData[newId] = { customLibrary: [], categories: [], categoryRelations: {}, clocks: [], channels: [], schedule: [] };
-            
-            document.getElementById('p0-client-name').value = '';
-            populateClientSelectors();
-            renderP0();
-        }
-
-        function toggleClientStatus(id) {
-            const c = DB.clients.find(x => x.id === id);
-            if(c.status === 'Activa') c.status = 'Suspendida';
-            else if(c.status === 'Suspendida') c.status = 'Bloqueada';
-            else c.status = 'Activa';
-            renderP0();
-            syncSidebarBadge();
-        }
-
-        function deleteClient(id) {
-            if(confirm("¿Seguro que deseas eliminar este cliente? Se borrarán sus datos aislados.")) {
-                DB.clients = DB.clients.filter(x => x.id !== id);
-                delete DB.clientData[id];
-                if(activeClientId === id) activeClientId = DB.clients[0]?.id || "";
-                populateClientSelectors();
-                syncSidebarBadge();
-                renderP0();
-            }
-        }
-
-        function uploadGlobalTrack() {
-            const presetKey = document.getElementById('p0-upload-preset').value;
-            const meta = UPLOAD_PRESETS[presetKey];
-            
-            DB.globalLibrary.push({
-                id: "g_" + Date.now(),
-                title: meta.title,
-                artist: meta.artist,
-                duration: meta.duration,
-                origin: "Global"
-            });
-            alert(`Pista "${meta.title}" inyectada con éxito en la Biblioteca Musical Global.`);
-        }
-
-        // ==========================================
-        // LÓGICA PANTALLA 1: BIBLIOTECA
-        // ==========================================
-        function getMergedLibrary(clientId) {
-            const data = DB.clientData[clientId] || { customLibrary: [] };
-            return [...DB.globalLibrary, ...data.customLibrary];
-        }
-
-        function renderP1() {
-            const tbody = document.getElementById('p1-library-table');
-            tbody.innerHTML = '';
-            const query = document.getElementById('p1-search').value.toLowerCase();
-            const list = getMergedLibrary(activeClientId);
-
-            list.forEach(track => {
-                if(query && !track.title.toLowerCase().includes(query) && !track.artist.toLowerCase().includes(query)) return;
-                
-                const min = Math.floor(track.duration / 60);
-                const sec = (track.duration % 60).toString().padStart(2, '0');
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${track.title}</strong></td>
-                    <td>${track.artist}</td>
-                    <td><code>${min}:${sec}</code></td>
-                    <td><span class="badge" style="background:${track.origin === 'Global' ? '#3A86FF' : '#8338EC'}">${track.origin}</span></td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" onclick="removeTrackFromClientLibrary('${track.id}')" ${track.origin === 'Global' ? 'disabled' : ''}>Eliminar</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function simularAnuncioPropio() {
-            const name = prompt("Nombre del anuncio o Jingle del Cliente:", "Promoción Fin de Semana");
+            let name = document.getElementById('p0-client-name').value;
             if(!name) return;
-            const duration = parseInt(prompt("Duración en segundos:", "30")) || 30;
-
-            DB.clientData[activeClientId].customLibrary.push({
-                id: "prop_" + Date.now(),
-                title: name,
-                artist: "Interno / Local",
-                duration: duration,
-                origin: "Propio"
-            });
-            renderP1();
+            let id = "c_" + Date.now();
+            DB.clients.push({id: id, name: name});
+            DB.clientData[id] = {categories:[], relations:{}, clocks:[], channels:[], schedule:[]};
+            document.getElementById('p0-client-name').value = '';
+            syncSelectors();
         }
 
-        function removeTrackFromClientLibrary(trackId) {
-            DB.clientData[activeClientId].customLibrary = DB.clientData[activeClientId].customLibrary.filter(t => t.id !== trackId);
-            renderP1();
+        function syncSelectors() {
+            let sel = document.getElementById('global-client-selector');
+            sel.innerHTML = '';
+            DB.clients.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.name}</option>`; });
+        }
+        window.onload = () => { syncSelectors(); lucide.createIcons(); };
+
+        function changeActiveClient() {
+            activeClientId = document.getElementById('global-client-selector').value;
         }
 
-        // ==========================================
-        // LÓGICA PANTALLA 2: CATEGORÍAS
-        // ==========================================
-        function renderP2() {
-            const container = document.getElementById('p2-categories-list');
-            container.innerHTML = '';
-            const cats = DB.clientData[activeClientId].categories;
-
-            if(cats.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted)">No tienes categorías creadas.</p>`;
-                return;
-            }
-
-            cats.forEach(cat => {
-                const count = (DB.clientData[activeClientId].categoryRelations[cat] || []).length;
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.style.margin = '0';
-                div.innerHTML = `
-                    <h3 style="color: var(--secondary);">${cat}</h3>
-                    <p style="font-size:13px; margin: 5px 0 15px 0;">Contiene: <strong>${count} audios</strong></p>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCategory('${cat}')">Eliminar</button>
-                `;
-                container.appendChild(div);
+        // RENDERIZADORES COMPONENTES
+        function renderP1() {
+            let tbody = document.getElementById('p1-library-table');
+            tbody.innerHTML = '';
+            DB.songs.forEach(s => {
+                tbody.innerHTML += `<tr><td>${s.title}</td><td>${s.duration}s</td><td><span class="badge badge-success">Global</span></td></tr>`;
             });
         }
 
         function createCategory() {
-            const val = document.getElementById('p2-cat-name').value.trim();
-            if(!val) return;
-            if(DB.clientData[activeClientId].categories.includes(val)) return alert("Ya existe la categoría.");
-
-            DB.clientData[activeClientId].categories.push(val);
-            DB.clientData[activeClientId].categoryRelations[val] = [];
+            let name = document.getElementById('p2-cat-name').value;
+            if(!name) return;
+            DB.clientData[activeClientId].categories.push(name);
+            DB.clientData[activeClientId].relations[name] = [];
             document.getElementById('p2-cat-name').value = '';
             renderP2();
         }
 
-        function deleteCategory(cat) {
-            DB.clientData[activeClientId].categories = DB.clientData[activeClientId].categories.filter(c => c !== cat);
-            delete DB.clientData[activeClientId].categoryRelations[cat];
-            renderP2();
+        function renderP2() {
+            let list = document.getElementById('p2-categories-list');
+            list.innerHTML = '';
+            DB.clientData[activeClientId].categories.forEach(c => {
+                list.innerHTML += `<div class="card"><h3>${c}</h3></div>`;
+            });
         }
 
-        // ==========================================
-        // LÓGICA PANTALLA 3: CLASIFICACIÓN (DRAG & DROP)
-        // ==========================================
         function renderP3() {
-            const selector = document.getElementById('p3-category-selector');
-            const currentSelected = selector.value;
-            selector.innerHTML = '';
+            let sel = document.getElementById('p3-category-selector');
+            if(sel.innerHTML == '') {
+                DB.clientData[activeClientId].categories.forEach(c => { sel.innerHTML += `<option value="${c}">${c}</option>`; });
+            }
+            let cat = sel.value;
+            let libP = document.getElementById('p3-library-panel');
+            let catP = document.getElementById('p3-category-panel');
+            libP.innerHTML = '<h3>Biblioteca</h3>';
+            catP.innerHTML = '<h3>Dentro</h3>';
 
-            const cats = DB.clientData[activeClientId].categories;
-            cats.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c; opt.innerText = c;
-                if(c === currentSelected) opt.selected = true;
-                selector.appendChild(opt);
-            });
+            if(!cat) return;
 
-            const libPanel = document.getElementById('p3-library-panel');
-            const catPanel = document.getElementById('p3-category-panel');
-            
-            // Limpiar manteniendo los títulos
-            libPanel.innerHTML = '<div class="panel-title">Biblioteca Completa (Arrastra o haz clic en +)</div>';
-            catPanel.innerHTML = '<div class="panel-title">Audios Dentro de esta Categoría</div>';
-
-            const activeCat = selector.value;
-            if(!activeCat) return;
-
-            const allTracks = getMergedLibrary(activeClientId);
-            const relatedIds = DB.clientData[activeClientId].categoryRelations[activeCat] || [];
-
-            allTracks.forEach(t => {
-                const isAssigned = relatedIds.includes(t.id);
-                
-                const item = document.createElement('div');
-                item.className = 'drag-item';
-                item.draggable = !isAssigned;
-                item.id = `drag_${t.id}`;
-                item.ondragstart = (e) => e.dataTransfer.setData("text/plain", t.id);
-
-                if(!isAssigned) {
-                    item.innerHTML = `<span>${t.title} <small style="color:var(--text-muted)">-${t.artist}</small></span>
-                                      <button class="btn btn-primary btn-sm" style="padding:2px 6px;" onclick="assignTrackToCat('${t.id}', '${activeCat}')">+</button>`;
-                    libPanel.appendChild(item);
+            DB.songs.forEach(s => {
+                if(!DB.clientData[activeClientId].relations[cat].includes(s.id)) {
+                    libP.innerHTML += `<div class="drag-item">${s.title} <button class="btn btn-primary" onclick="addTrackToCat('${s.id}','${cat}')">+</button></div>`;
                 } else {
-                    item.innerHTML = `<span>${t.title} <small style="color:var(--text-muted)">-${t.artist}</small></span>
-                                      <button class="btn btn-danger btn-sm" style="padding:2px 6px;" onclick="unassignTrackFromCat('${t.id}', '${activeCat}')">x</button>`;
-                    catPanel.appendChild(item);
+                    catP.innerHTML += `<div class="drag-item">${s.title}</div>`;
                 }
             });
         }
 
-        function assignTrackToCat(trackId, cat) {
-            if(!DB.clientData[activeClientId].categoryRelations[cat].includes(trackId)) {
-                DB.clientData[activeClientId].categoryRelations[cat].push(trackId);
-                renderP3();
-            }
-        }
-
-        function unassignTrackFromCat(trackId, cat) {
-            DB.clientData[activeClientId].categoryRelations[cat] = DB.clientData[activeClientId].categoryRelations[cat].filter(id => id !== trackId);
+        function addTrackToCat(sid, cat) {
+            DB.clientData[activeClientId].relations[cat].push(sid);
             renderP3();
         }
 
-        function allowDrop(e) { e.preventDefault(); }
-        function dropToCategory(e) {
-            e.preventDefault();
-            const id = e.dataTransfer.getData("text/plain");
-            const cat = document.getElementById('p3-category-selector').value;
-            if(id && cat) assignTrackToCat(id, cat);
-        }
-        function dropToLibrary(e) {
-            e.preventDefault();
-            const id = e.dataTransfer.getData("text/plain");
-            const cat = document.getElementById('p3-category-selector').value;
-            if(id && cat) unassignTrackFromCat(id, cat);
-        }
-
-        // ==========================================
-        // LÓGICA PANTALLA 4: RELOJES MUSICALES
-        // ==========================================
-        function renderP4() {
-            const clockSel = document.getElementById('p4-clock-selector');
-            const catSel = document.getElementById('p4-cat-selector');
-            const selectedClock = clockSel.value;
-
-            clockSel.innerHTML = '';
-            catSel.innerHTML = '';
-
-            const data = DB.clientData[activeClientId];
-            data.clocks.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id; opt.innerText = c.name;
-                if(c.id === selectedClock) opt.selected = true;
-                clockSel.appendChild(opt);
-            });
-
-            data.categories.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat; opt.innerText = cat;
-                catSel.appendChild(opt);
-            });
-
-            renderClockTimeline();
-        }
-
         function createClock() {
-            const name = document.getElementById('p4-clock-name').value.trim();
+            let name = document.getElementById('p4-clock-name').value;
             if(!name) return;
-
-            const newId = "clk_" + Date.now();
-            DB.clientData[activeClientId].clocks.push({ id: newId, name: name, sequence: [] });
+            DB.clientData[activeClientId].clocks.push({name: name, seq: []});
             document.getElementById('p4-clock-name').value = '';
             renderP4();
         }
 
-        function addCategoryToClock() {
-            const clockId = document.getElementById('p4-clock-selector').value;
-            const cat = document.getElementById('p4-cat-selector').value;
-            if(!clockId || !cat) return;
-
-            const clock = DB.clientData[activeClientId].clocks.find(c => c.id === clockId);
-            clock.sequence.push(cat);
+        function renderP4() {
+            let clkSel = document.getElementById('p4-clock-selector');
+            let catSel = document.getElementById('p4-cat-selector');
+            clkSel.innerHTML = ''; catSel.innerHTML = '';
+            DB.clientData[activeClientId].clocks.forEach(c => { clkSel.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
+            DB.clientData[activeClientId].categories.forEach(c => { catSel.innerHTML += `<option value="${c}">${c}</option>`; });
             renderClockTimeline();
         }
 
-        function removeClockSlot(index) {
-            const clockId = document.getElementById('p4-clock-selector').value;
-            const clock = DB.clientData[activeClientId].clocks.find(c => c.id === clockId);
-            clock.sequence.splice(index, 1);
+        function addCategoryToClock() {
+            let clkName = document.getElementById('p4-clock-selector').value;
+            let cat = document.getElementById('p4-cat-selector').value;
+            let clk = DB.clientData[activeClientId].clocks.find(c => c.name === clkName);
+            if(clk && cat) clk.seq.push(cat);
             renderClockTimeline();
         }
 
         function renderClockTimeline() {
-            const container = document.getElementById('p4-timeline');
+            let container = document.getElementById('p4-timeline');
             container.innerHTML = '';
-            const clockId = document.getElementById('p4-clock-selector').value;
-            if(!clockId) return;
-
-            const clock = DB.clientData[activeClientId].clocks.find(c => c.id === clockId);
-            if(clock.sequence.length === 0) {
-                container.innerHTML = `<span style="color:var(--text-muted);">Reloj vacío. Agrega categorías arriba.</span>`;
-                return;
+            let clkName = document.getElementById('p4-clock-selector').value;
+            let clk = DB.clientData[activeClientId].clocks.find(c => c.name === clkName);
+            if(clk) {
+                clk.seq.forEach(cat => { container.innerHTML += `<div class="clock-slot">${cat}</div>`; });
             }
-
-            clock.sequence.forEach((cat, idx) => {
-                const slot = document.createElement('div');
-                slot.className = 'clock-slot';
-                slot.innerHTML = `<span>${idx + 1}. ${cat}</span> <i data-lucide="x" onclick="removeClockSlot(${idx})" style="width:14px;"></i>`;
-                container.appendChild(slot);
-            });
-            lucide.createIcons();
-        }
-
-        // ==========================================
-        // LÓGICA PANTALLA 5: CANALES
-        // ==========================================
-        function renderP5() {
-            const container = document.getElementById('p5-channels-list');
-            container.innerHTML = '';
-            const channels = DB.clientData[activeClientId].channels;
-
-            if(channels.length === 0) {
-                container.innerHTML = `<p style="color:var(--text-muted)">No hay canales configurados para este local.</p>`;
-                return;
-            }
-
-            channels.forEach(ch => {
-                const div = document.createElement('div');
-                div.className = 'card'; div.style.margin = '0';
-                div.innerHTML = `
-                    <h3 style="color: var(--primary);"><i data-lucide="layers" style="display:inline; width:16px;"></i> ${ch}</h3>
-                    <p style="font-size:12px; margin: 10px 0;"><span class="badge badge-success">Salida de Audio Lista</span></p>
-                    <button class="btn btn-danger btn-sm" onclick="deleteChannel('${ch}')">Remover</button>
-                `;
-                container.appendChild(div);
-            });
-            lucide.createIcons();
         }
 
         function createChannel() {
-            const name = document.getElementById('p5-channel-name').value.trim();
+            let name = document.getElementById('p5-channel-name').value;
             if(!name) return;
-            if(DB.clientData[activeClientId].channels.includes(name)) return alert("El canal ya existe.");
-
             DB.clientData[activeClientId].channels.push(name);
             document.getElementById('p5-channel-name').value = '';
             renderP5();
         }
 
-        function deleteChannel(ch) {
-            DB.clientData[activeClientId].channels = DB.clientData[activeClientId].channels.filter(c => c !== ch);
-            renderP5();
+        function renderP5() {
+            let list = document.getElementById('p5-channels-list');
+            list.innerHTML = '';
+            DB.clientData[activeClientId].channels.forEach(ch => { list.innerHTML += `<div class="card"><h3>${ch}</h3></div>`; });
         }
 
-        // ==========================================
-        // LÓGICA PANTALLA 6: PROGRAMACIÓN SEMANAL
-        // ==========================================
         function renderP6() {
-            const chSel = document.getElementById('p6-channel-selector');
-            const clkSel = document.getElementById('p6-clock-selector');
-            const filterCh = document.getElementById('p6-filter-channel');
-
-            const selectedFilter = filterCh.value;
-
-            chSel.innerHTML = ''; clkSel.innerHTML = ''; filterCh.innerHTML = '';
-
-            const data = DB.clientData[activeClientId];
-            
-            data.channels.forEach(ch => {
-                const opt1 = document.createElement('option'); opt1.value = ch; opt1.innerText = ch;
-                chSel.appendChild(opt1);
-                
-                const opt2 = document.createElement('option'); opt2.value = ch; opt2.innerText = ch;
-                if(ch === selectedFilter) opt2.selected = true;
-                filterCh.appendChild(opt2);
-            });
-
-            data.clocks.forEach(clk => {
-                const opt = document.createElement('option'); opt.value = clk.id; opt.innerText = clk.name;
-                clkSel.appendChild(opt);
-            });
-
-            // Dibujar Calendario semanal filtrado
-            const calView = document.getElementById('p6-calendar-view');
-            calView.innerHTML = '';
-
-            const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-            const targetChannel = filterCh.value;
-
-            if(!targetChannel) {
-                calView.innerHTML = '<div style="grid-column: span 2; text-align:center; color:var(--text-muted);">Crea un canal primero.</div>';
-                return;
-            }
-
-            days.forEach(day => {
-                const label = document.createElement('div');
-                label.className = 'sched-label';
-                label.innerText = day;
-                calView.appendChild(label);
-
-                const slotsDiv = document.createElement('div');
-                slotsDiv.className = 'sched-slots';
-
-                const blocks = data.schedule.filter(s => s.day === day && s.channel === targetChannel);
-                if(blocks.length === 0) {
-                    slotsDiv.innerHTML = `<span style="color:rgba(255,255,255,0.1); font-size:12px;">Sin programación</span>`;
-                } else {
-                    blocks.forEach(b => {
-                        const clkObj = data.clocks.find(x => x.id === b.clockId);
-                        const blockCard = document.createElement('div');
-                        blockCard.className = 'sched-card';
-                        blockCard.innerHTML = `<span>⏳ <b>${b.start}-${b.end}</b>: ${clkObj ? clkObj.name : 'Reloj Desconocido'}</span>
-                                               <i data-lucide="trash-2" style="width:12px; color:var(--danger); cursor:pointer;" onclick="deleteSchedule('${b.id}')"></i>`;
-                        slotsDiv.appendChild(blockCard);
-                    });
-                }
-                calView.appendChild(slotsDiv);
-            });
-            lucide.createIcons();
+            let ch = document.getElementById('p6-channel-selector');
+            let clk = document.getElementById('p6-clock-selector');
+            ch.innerHTML = ''; clk.innerHTML = '';
+            DB.clientData[activeClientId].channels.forEach(c => { ch.innerHTML += `<option value="${c}">${c}</option>`; });
+            DB.clientData[activeClientId].clocks.forEach(c => { clk.innerHTML += `<option value="${c.name}">${c.name}</option>`; });
         }
 
         function addSchedule() {
-            const day = document.getElementById('p6-day').value;
-            const start = document.getElementById('p6-start').value;
-            const end = document.getElementById('p6-end').value;
-            const channel = document.getElementById('p6-channel-selector').value;
-            const clockId = document.getElementById('p6-clock-selector').value;
-
-            if(!channel || !clockId) return alert("Asegúrate de tener un canal y un reloj seleccionados.");
-
-            DB.clientData[activeClientId].schedule.push({
-                id: "sch_" + Date.now(), day: day, start: start, end: end, channel: channel, clockId: clockId
-            });
-            renderP6();
+            let ch = document.getElementById('p6-channel-selector').value;
+            let clk = document.getElementById('p6-clock-selector').value;
+            DB.clientData[activeClientId].schedule.push({channel: ch, clock: clk});
+            alert("Reloj asignado al canal de manera exitosa.");
         }
 
-        function deleteSchedule(id) {
-            DB.clientData[activeClientId].schedule = DB.clientData[activeClientId].schedule.filter(x => x.id !== id);
-            renderP6();
-        }
-
-        // ==========================================
-        // LÓGICA PANTALLA 7: REPRODUCTOR AUTOMÁTICO
-        // ==========================================
         function renderP7() {
-            const chSel = document.getElementById('p7-channel-selector');
-            const selected = chSel.value;
-            chSel.innerHTML = '';
-            
-            DB.clientData[activeClientId].channels.forEach(ch => {
-                const opt = document.createElement('option'); opt.value = ch; opt.innerText = ch;
-                if(ch === selected) opt.selected = true;
-                chSel.appendChild(opt);
-            });
-
-            if(!playerState.activeChannel && chSel.value) {
-                initPlayerForChannel();
-            }
-            updatePlayerUI();
+            let sel = document.getElementById('p7-channel-selector');
+            sel.innerHTML = '';
+            DB.clientData[activeClientId].channels.forEach(c => { sel.innerHTML += `<option value="${c}">${c}</option>`; });
         }
 
-        function initPlayerForChannel() {
-            const channel = document.getElementById('p7-channel-selector').value;
-            if(!channel) return;
+        // ==========================================
+        // REPRODUCTOR DE HARDWARE REAL AUTOMATIZADO
+        // ==========================================
+        let playerIndex = 0;
+        let activeChannelForPlayback = "";
 
-            // Reiniciar player
-            clearInterval(playerState.intervalId);
-            playerState.isPlaying = false;
-            playerState.activeChannel = channel;
-            playerState.currentTrack = null;
-            playerState.secondsRemaining = 0;
-            
-            // Buscar reloj asignado (en este MVP simplificado tomamos el primero programado o existente)
-            const sched = DB.clientData[activeClientId].schedule.find(s => s.channel === channel);
-            if(sched) {
-                playerState.activeClockId = sched.clockId;
-            } else {
-                const firstClock = DB.clientData[activeClientId].clocks[0];
-                playerState.activeClockId = firstClock ? firstClock.id : "";
-            }
-            playerState.currentSequenceIndex = 0;
-            
-            updatePlayerUI();
+        function initPlayerChannel() {
+            activeChannelForPlayback = document.getElementById('p7-channel-selector').value;
+            playerIndex = 0;
         }
 
-        function toggleAutoPlayer() {
-            const btn = document.getElementById('player-toggle-btn');
-            if(playerState.isPlaying) {
-                // Pausar
-                playerState.isPlaying = false;
-                clearInterval(playerState.intervalId);
-                btn.innerHTML = `<i data-lucide="play"></i> Iniciar Automatización`;
-            } else {
-                if(!playerState.activeClockId) return alert("Este canal no tiene un reloj musical asociado para automatizar.");
-                // Iniciar
-                playerState.isPlaying = true;
-                btn.innerHTML = `<i data-lucide="pause"></i> Detener Automatización`;
-                executePlayerTick();
-                playerState.intervalId = setInterval(executePlayerTick, 1000);
+        function startHardwarePlayer() {
+            if(!activeChannelForPlayback) activeChannelForPlayback = document.getElementById('p7-channel-selector').value;
+            if(!activeChannelForPlayback) return alert("Por favor crea y selecciona un canal primero.");
+
+            // Buscar la programación
+            let sched = DB.clientData[activeClientId].schedule.find(s => s.channel === activeChannelForPlayback);
+            if(!sched) return alert("Este canal no tiene un reloj musical asignado en la Pantalla 6.");
+
+            let clock = DB.clientData[activeClientId].clocks.find(c => c.name === sched.clock);
+            if(!clock || clock.seq.length === 0) return alert("El reloj asignado no tiene categorías en su secuencia.");
+
+            // Obtener la categoría del índice actual de la secuencia cíclica
+            let targetCategory = clock.seq[playerIndex % clock.seq.length];
+            let targetSongsIds = DB.clientData[activeClientId].relations[targetCategory] || [];
+
+            if(targetSongsIds.length === 0) {
+                alert(`La categoría "${targetCategory}" no tiene música asignada. Saltando al siguiente bloque.`);
+                playerIndex++;
+                startHardwarePlayer();
+                return;
             }
-            lucide.createIcons();
-        }
 
-        function executePlayerTick() {
-            if(!playerState.isPlaying) return;
+            // Seleccionar ID aleatorio dentro de la categoría seleccionada por el reloj
+            let randomSongId = targetSongsIds[Math.floor(Math.random() * targetSongsIds.length)];
+            
+            // SACAR EL BINARIO DEL MP3 DE INDEXEDDB PARA REPRODUCIRLO EN EL HARDWARE REAL
+            let tx = indexedDBInstance.transaction("audios", "readonly");
+            let req = tx.objectStore("audios").get(randomSongId);
+            
+            req.onsuccess = e => {
+                let audioRecord = e.target.result;
+                if(audioRecord) {
+                    let audioPlayer = document.getElementById('real-audio-player');
+                    
+                    // Liberar memoria previa
+                    if(currentAudioFileUrl) URL.revokeObjectURL(currentAudioFileUrl);
+                    
+                    // Convertir el Blob binario en una URL ejecutable nativamente
+                    currentAudioFileUrl = URL.createObjectURL(audioRecord.blob);
+                    audioPlayer.src = currentAudioFileUrl;
+                    
+                    // Actualizar UI
+                    document.getElementById('player-title').innerText = randomSongId.substring(4);
+                    document.getElementById('player-artist').innerText = `Categoría Actual: ${targetCategory}`;
+                    
+                    audioPlayer.play();
+                    
+                    // Evento de fin de pista: Llama cíclicamente al siguiente paso del reloj musical de forma infinita
+                    audioPlayer.onended = () => {
+                        playerIndex++;
+                        startHardwarePlayer();
+                    };
 
-            if(playerState.secondsRemaining <= 0) {
-                // Toca cambiar de canción basándonos en la secuencia del reloj
-                const clock = DB.clientData[activeClientId].clocks.find(c => c.id === playerState.activeClockId);
-                if(!clock || clock.sequence.length === 0) {
-                    playerState.isPlaying = false;
-                    clearInterval(playerState.intervalId);
-                    alert("El reloj está vacío de categorías.");
-                    return;
+                    // Monitor de tiempo real
+                    audioPlayer.ontimeupdate = () => {
+                        let pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                        document.getElementById('player-progress-bar').style.width = `${pct}%`;
+                        let m = Math.floor(audioPlayer.currentTime / 60);
+                        let s = Math.floor(audioPlayer.currentTime % 60).toString().padStart(2, '0');
+                        document.getElementById('player-time').innerText = `${m}:${s}`;
+                    };
                 }
-
-                // Sacar categoría esperada
-                const targetCat = clock.sequence[playerState.currentSequenceIndex];
-                
-                // Buscar canción aleatoria en esa categoría
-                const allowedIds = DB.clientData[activeClientId].categoryRelations[targetCat] || [];
-                const allTracks = getMergedLibrary(activeClientId);
-                const candidates = allTracks.filter(t => allowedIds.includes(t.id));
-
-                if(candidates.length === 0) {
-                    // Failover: Si la categoría está vacía, no rompe, inyecta pista de silencio/espera por 10 seg
-                    playerState.currentTrack = { title: `[Sin pistas en ${targetCat}]`, artist: "Agrega contenido en P3", duration: 10 };
-                } else {
-                    const randomIdx = Math.floor(Math.random() * candidates.length);
-                    playerState.currentTrack = candidates[randomIdx];
-                }
-
-                playerState.secondsRemaining = playerState.currentTrack.duration;
-                
-                // Mover puntero cíclico del reloj
-                playerState.currentSequenceIndex = (playerState.currentSequenceIndex + 1) % clock.sequence.length;
-            } else {
-                playerState.secondsRemaining--;
-            }
-
-            updatePlayerUI();
+            };
         }
 
-        function skipTrack() {
-            playerState.secondsRemaining = 0;
-            if(playerState.isPlaying) executePlayerTick();
-            else updatePlayerUI();
-        }
-
-        function updatePlayerUI() {
-            document.getElementById('player-channel-badge').innerText = `CANAL MONITOR: ${playerState.activeChannel || 'NINGUNO'}`;
-            
-            if(playerState.currentTrack) {
-                document.getElementById('player-title').innerText = playerState.currentTrack.title;
-                document.getElementById('player-artist').innerText = playerState.currentTrack.artist;
-                
-                const clock = DB.clientData[activeClientId].clocks.find(c => c.id === playerState.activeClockId);
-                const prevIndex = (playerState.currentSequenceIndex - 1 + clock?.sequence.length) % clock?.sequence.length;
-                
-                document.getElementById('player-cat-badge').innerText = `Categoría: ${clock ? clock.sequence[prevIndex] : '--'}`;
-                document.getElementById('player-clock-badge').innerText = `Reloj Origen: ${clock ? clock.name : '--'}`;
-                
-                // Tiempo
-                const min = Math.floor(playerState.secondsRemaining / 60);
-                const sec = (playerState.secondsRemaining % 60).toString().padStart(2, '0');
-                document.getElementById('player-time-display').innerText = `${min}:${sec}`;
-                
-                // Barra
-                const pct = ((playerState.currentTrack.duration - playerState.secondsRemaining) / playerState.currentTrack.duration) * 100;
-                document.getElementById('player-progress-bar').style.width = `${pct}%`;
-            } else {
-                document.getElementById('player-title').innerText = "REPRODUCTOR DETENIDO";
-                document.getElementById('player-artist').innerText = "Presiona 'Iniciar Automatización' para arrancar";
-                document.getElementById('player-time-display').innerText = "00:00";
-                document.getElementById('player-progress-bar').style.width = "0%";
-            }
-
-            // Renderizar cola futura proyectada
-            const qTbody = document.getElementById('player-queue-table');
-            qTbody.innerHTML = '';
-            const clock = DB.clientData[activeClientId].clocks.find(c => c.id === playerState.activeClockId);
-            
-            if(clock && clock.sequence.length > 0) {
-                let tempIdx = playerState.currentSequenceIndex;
-                for(let i=0; i<4; i++) {
-                    const nextCat = clock.sequence[tempIdx];
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>En ${i+1} turnos</td>
-                                    <td><span class="badge" style="background:#8338EC;">${nextCat}</span></td>
-                                    <td>Auto-Selección Aleatoria</td>`;
-                    qTbody.appendChild(tr);
-                    tempIdx = (tempIdx + 1) % clock.sequence.length;
-                }
-            } else {
-                qTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Sin secuencia de reloj activa.</td></tr>`;
-            }
+        function skipHardwareTrack() {
+            let audioPlayer = document.getElementById('real-audio-player');
+            audioPlayer.pause();
+            playerIndex++;
+            startHardwarePlayer();
         }
     </script>
 </body>
